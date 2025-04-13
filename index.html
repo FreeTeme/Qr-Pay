@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сканировать QR-код | Coffee Like</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        :root {
+            --primary: #6F4E37;
+            --secondary: #D2B48C;
+            --dark: #2D3436;
+            --light: #F9F5F0;
+            --accent: #C4A484;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Хедер */
+        .qr-header {
+            background: linear-gradient(135deg, var(--primary), #8B5A2B);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 25px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+            background: rgba(255,255,255,0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            transform: translateX(-3px);
+            background: rgba(255,255,255,0.3);
+        }
+
+        .qr-title {
+            font-weight: 600;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        /* Контейнер камеры (полноэкранный) */
+        .camera-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 80px; /* Отступ для хедера */
+            padding-bottom: 90px; /* Отступ для навигации */
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            padding-top: 80px;
+            padding-bottom: 90px;
+        }
+
+        .scan-frame {
+            width: 80%;
+            max-width: 350px;
+            aspect-ratio: 1/1;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.7);
+        }
+
+        .scan-frame::before,
+        .scan-frame::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 4px solid transparent;
+        }
+
+        .scan-frame::before {
+            top: -4px;
+            left: -4px;
+            border-top-color: var(--secondary);
+            border-left-color: var(--secondary);
+        }
+
+        .scan-frame::after {
+            bottom: -4px;
+            right: -4px;
+            border-bottom-color: var(--secondary);
+            border-right-color: var(--secondary);
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            background: rgba(210, 180, 140, 0.8);
+            animation: scan 2s infinite linear;
+            border-radius: 2px;
+        }
+
+        @keyframes scan {
+            0% { top: 10%; }
+            100% { top: 90%; }
+        }
+
+        .scan-hint {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            font-size: 16px;
+            padding: 0 20px;
+            position: absolute;
+            bottom: 120px;
+            left: 0;
+            right: 0;
+        }
+
+        /* Результат сканирования (изначально скрыт) */
+        .result-page {
+            display: none;
+            padding: 25px;
+            padding-top: 90px;
+            padding-bottom: 90px;
+            min-height: 100vh;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            font-size: 22px;
+            color: var(--primary);
+        }
+
+        .result-close {
+            background: rgba(0,0,0,0.05);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
+        }
+
+        .result-url {
+            display: block;
+            padding: 15px;
+            background: rgba(111, 78, 55, 0.05);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            word-break: break-all;
+            font-size: 15px;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .result-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .result-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .result-btn-primary:hover {
+            background: #5a3d2b;
+            transform: translateY(-2px);
+        }
+
+        .result-btn-secondary {
+            background: rgba(0,0,0,0.05);
+            color: var(--dark);
+        }
+
+        .result-btn-secondary:hover {
+            background: rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Навигация */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 12px;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(111, 78, 55, 0.1);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 30px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        /* Сообщение об ошибке */
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: white;
+            background: rgba(231, 76, 60, 0.8);
+            border-radius: 10px;
+            margin: 20px;
+            font-weight: 500;
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            z-index: 20;
+        }
+
+        /* Загрузка */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 30;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Хедер -->
+    <header class="qr-header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="qr-title">Сканировать QR-код</div>
+    </header>
+
+    <!-- Камера (полноэкранный режим) -->
+    <div class="camera-container" id="cameraContainer">
+        <video id="video" playsinline></video>
+        <div class="scan-overlay">
+            <div class="scan-frame">
+                <div class="scan-line"></div>
+            </div>
+        </div>
+        <p class="scan-hint">Наведите камеру на QR-код для сканирования</p>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div class="error-message" id="errorMessage">
+        <i class="fas fa-exclamation-triangle"></i><br><br>
+        Не удалось получить доступ к камере. Пожалуйста, разрешите доступ к камере и обновите страницу.
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p>Обработка QR-кода...</p>
+    </div>
+
+    <!-- Страница результата (изначально скрыта) -->
+    <div class="result-page" id="resultPage">
+        <div class="result-header">
+            <div class="result-title">Результат сканирования</div>
+            <button class="result-close" onclick="resumeScanning()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="result-content">
+            <p>Содержимое QR-кода:</p>
+            <a href="#" class="result-url" id="resultUrl" target="_blank"></a>
+            
+            <div class="result-actions">
+                <button class="result-btn result-btn-primary" onclick="openLink()">
+                    <i class="fas fa-external-link-alt"></i>
+                    Перейти по ссылке
+                </button>
+                <button class="result-btn result-btn-secondary" onclick="resumeScanning()">
+                    <i class="fas fa-redo"></i>
+                    Сканировать снова
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            Главная
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            На карте
+        </a>
+        <a href="qr.html" class="nav-item active">
+            <i class="fas fa-qrcode"></i>
+            QR-код
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            Профиль
+        </a>
+    </nav>
+
+    <script>
+        // Элементы DOM
+        const video = document.getElementById('video');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const resultPage = document.getElementById('resultPage');
+        const resultUrl = document.getElementById('resultUrl');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        let scanning = true;
+        let currentUrl = '';
+
+        // Запуск камеры
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                video.srcObject = stream;
+                video.play();
+                requestAnimationFrame(tick);
+            } catch (err) {
+                console.error('Ошибка доступа к камере:', err);
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Обработка кадров
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Получаем изображение с области сканирования (центральные 70%)
+                const scanSize = Math.min(canvas.width, canvas.height) * 0.7;
+                const x = (canvas.width - scanSize) / 2;
+                const y = (canvas.height - scanSize) / 2;
+                
+                const imageData = ctx.getImageData(x, y, scanSize, scanSize);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+                
+                if (code) {
+                    scanning = false;
+                    currentUrl = code.data;
+                    showResult(code.data);
+                }
+            }
+            
+            if (scanning) {
+                requestAnimationFrame(tick);
+            }
+        }
+
+        // Показать результат (скрыть камеру)
+        function showResult(url) {
+            // Показать индикатор загрузки
+            loading.style.display = 'flex';
+            
+            // Имитация обработки (в реальном приложении можно убрать)
+            setTimeout(() => {
+                // Скрыть камеру и загрузку
+                cameraContainer.style.display = 'none';
+                loading.style.display = 'none';
+                
+                // Показать результат
+                resultUrl.textContent = url;
+                resultUrl.href = url;
+                resultPage.style.display = 'block';
+                
+                // Остановить камеру
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+            }, 1000);
+        }
+
+        // Открыть ссылку
+        function openLink() {
+            if (currentUrl) {
+                window.open(currentUrl, '_blank');
+            }
+        }
+
+        // Возобновить сканирование
+        function resumeScanning() {
+            // Скрыть результат
+            resultPage.style.display = 'none';
+            
+            // Показать камеру
+            cameraContainer.style.display = 'flex';
+            
+            // Сбросить флаги
+            scanning = true;
+            currentUrl = '';
+            
+            // Перезапустить камеру
+            startCamera();
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            startCamera();
+            
+            // Обработка навигации
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!this.classList.contains('active')) {
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Остановка камеры при закрытии страницы
+        window.addEventListener('beforeunload', () => {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>

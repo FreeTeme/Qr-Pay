@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business.name }} | Бонусы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6F4E37; /* Кофейный цвет */
+            --secondary: #D2B48C; /* Бежевый */
+            --dark: #2D3436;
+            --light: #F9F5F0; /* Светло-бежевый фон */
+            --accent: #C4A484; /* Акцентный бежевый */
+            --business-color: #6F4E37;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            padding-bottom: 90px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Прелоадер */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .preloader-logo i {
+            color: white;
+            font-size: 36px;
+        }
+
+        .preloader-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .preloader-progress {
+            width: 200px;
+            height: 6px;
+            background: rgba(111, 78, 55, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preloader-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Хедер */
+        .business-header {
+            background: linear-gradient(135deg, var(--business-color), #8B5A2B);
+            color: white;
+            padding: 30px 20px 40px;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            z-index: 1;
+        }
+
+        .business-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="rgba(255,255,255,0.05)" d="M30,10L50,30L70,10L90,30L70,50L90,70L70,90L50,70L30,90L10,70L30,50L10,30L30,10Z"/></svg>');
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+            background: rgba(255,255,255,0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            transform: translateX(-3px);
+            background: rgba(255,255,255,0.3);
+        }
+
+        .business-info {
+            text-align: center;
+            padding-top: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .business-logo-large {
+            width: 90px;
+            height: 90px;
+            border-radius: 22px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .business-logo-large::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transform: rotate(30deg);
+        }
+
+        .business-logo-large:hover {
+            transform: translateY(-5px) rotate(5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .business-logo-large i {
+            color: var(--business-color);
+            font-size: 45px;
+        }
+
+        .business-title {
+            font-weight: 600;
+            font-size: 24px;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .business-description {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .points-count {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #fff, #F5D6B4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            display: inline-block;
+        }
+
+        .points-count::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .points-label {
+            font-size: 14px;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        /* Новый слайдер с тремя блоками */
+        .dashboard-slider {
+            padding: 25px 0;
+            position: relative;
+            margin-top: -20px;
+            z-index: 5;
+        }
+
+        .swiper {
+            padding: 0 25px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            height: 180px;
+            width: 85% !important;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Стиль для карточки "Плюсик" */
+        .add-card {
+            background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .add-card .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 24px;
+            transition: var(--transition);
+        }
+
+        .add-card:hover .card-icon {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .add-card .card-title {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        /* Стиль для карточки "Моя аналитика" */
+        .analytics-card {
+            background: linear-gradient(135deg, #fff, #f8f4ee);
+            border-left: 5px solid var(--primary);
+        }
+
+        .analytics-card .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .analytics-card .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(111, 78, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .analytics-card .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        .analytics-card .card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .stat-item {
+            background: rgba(111, 78, 55, 0.05);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #777;
+            font-weight: 500;
+        }
+
+        /* Стиль для карточки "Акции" */
+        .promo-card {
+            background: linear-gradient(135deg, #6F4E37, #8B5A2B);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .promo-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="rgba(255,255,255,0.05)" d="M20,20L50,50L20,80L50,50L80,80L50,50L80,20L50,50Z"/></svg>');
+            opacity: 0.2;
+            transform: rotate(30deg);
+        }
+
+        .promo-card .card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #D2B48C;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .promo-card .card-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .promo-card .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .promo-card .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .promo-card .card-desc {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: auto;
+        }
+
+        .promo-card .card-cta {
+            margin-top: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #D2B48C;
+            display: flex;
+            align-items: center;
+        }
+
+        .promo-card .card-cta i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .promo-card:hover .card-cta i {
+            transform: translateX(3px);
+        }
+
+        /* Прогресс уровня */
+        .level-progress {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 25px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .level-progress:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .level-title {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .level-status {
+            color: var(--primary);
+            font-weight: 700;
+            background: rgba(111, 78, 55, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #F1EFEA;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--business-color), #D2B48C);
+            border-radius: 10px;
+            width: 42%;
+            position: relative;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                          rgba(255,255,255,0.1) 0%, 
+                          rgba(255,255,255,0.3) 50%, 
+                          rgba(255,255,255,0.1) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Карта */
+        .map-container {
+            height: 200px;
+            margin: 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .map-container:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.01), rgba(0,0,0,0.03));
+            pointer-events: none;
+            z-index: 10;
+            border-radius: 20px;
+        }
+
+        #businessMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* История операций */
+        .history-section {
+            margin: 25px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .history-section:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-header {
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .history-header i {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .history-items {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: rgba(111, 78, 55, 0.03);
+        }
+
+        .history-item:hover::before {
+            opacity: 1;
+        }
+
+        .history-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(111, 78, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--business-color);
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .history-item:hover .history-icon {
+            transform: scale(1.05);
+            background: rgba(111, 78, 55, 0.15);
+        }
+
+        .history-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .history-amount {
+            font-weight: 600;
+            font-size: 15px;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        .history-amount.plus {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .history-amount.plus::before {
+            content: '+';
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 25px;
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: rgba(0,0,0,0.05);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            background: rgba(0,0,0,0.1);
+            color: var(--dark);
+            transform: rotate(90deg);
+        }
+
+        /* Модальное окно бизнесов */
+        .modal-businesses {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .modal-business-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .modal-business-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-business-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .modal-business-name {
+            font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Модальное окно аналитики */
+        .analytics-modal-content {
+            max-width: 500px;
+        }
+
+        .analytics-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .analytics-stat {
+            background: rgba(111, 78, 55, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .analytics-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .analytics-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .analytics-chart {
+            height: 200px;
+            background: #f9f5f0;
+            border-radius: 15px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+
+        .chart-bar {
+            width: 30px;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: height 1s ease;
+        }
+
+        .chart-bar::after {
+            content: attr(data-time);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #666;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Модальное окно акций */
+        .promo-modal-content {
+            max-width: 500px;
+        }
+
+        .promo-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .promo-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        .promo-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .promo-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .promo-date {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+        }
+
+        .promo-date i {
+            margin-right: 5px;
+        }
+
+        .promo-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #D2B48C;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        /* Навигация */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 12px;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(111, 78, 55, 0.1);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 30px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a3d2b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Прелоадер -->
+    <div class="preloader">
+        <div class="preloader-logo">
+            <i class="fas fa-coffee"></i>
+        </div>
+        <div class="preloader-text">{{ business.name }}</div>
+        <div class="preloader-progress">
+            <div class="preloader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Хедер бизнеса -->
+    <header class="business-header fade-in">
+        <a href="#" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="business-info">
+            <div class="business-logo-large">
+                <i class="fas fa-coffee"></i>
+            </div>
+            <h1 class="business-title">{{ business.name }}</h1>
+            <p class="business-description">{{ business.description }}</p>
+            <div class="points-count">{{ user.balance }} баллов</div>
+            <div class="points-label">Накоплено</div>
+        </div>
+    </header>
+
+    <!-- Новый слайдер с тремя блоками -->
+    <div class="dashboard-slider fade-in delay-1">
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <!-- Блок "Плюсик" -->
+                <div class="swiper-slide">
+                    <div class="dashboard-card add-card" onclick="openBusinessModal()">
+                        <div class="card-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="card-title">Добавить бизнес</div>
+                    </div>
+                </div>
+                
+                <!-- Блок "Моя аналитика" -->
+                <div class="swiper-slide">
+                    <div class="dashboard-card analytics-card" onclick="openAnalyticsModal()">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="card-title">Моя аналитика</div>
+                        </div>
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">{{ stats.total_visits }}</div>
+                                <div class="stat-label">Посещения</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ stats.monthly_visits }}</div>
+                                <div class="stat-label">В этом месяце</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ user.balance }}</div>
+                                <div class="stat-label">Баллов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ stats.popular_time['hour'] if stats.popular_time else '--:--' }}</div>
+                                <div class="stat-label">Частое время</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Блок "Акции" -->
+                <div class="swiper-slide">
+                    <div class="dashboard-card promo-card" onclick="openPromoModal()">
+                        {% if promos|length > 0 %}
+                        <div class="card-badge">{{ promos[0].badge }}</div>
+                        {% endif %}
+                        <div class="card-content">
+                            <div class="card-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="card-title">Специальные предложения</div>
+                            <div class="card-desc">Узнайте о текущих акциях и специальных предложениях</div>
+                            <div class="card-cta">
+                                Посмотреть все
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Прогресс уровня -->
+    <div class="level-progress fade-in delay-2">
+        <div class="level-header">
+            <div class="level-title">Ваш уровень в {{ business.name }}</div>
+            <div class="level-status">{{ user.level }}</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-info">
+                <span>{{ user.progress }}/1000 баллов</span>
+                <span>{{ (user.progress / 10) }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (user.progress / 10) }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Карта -->
+    <div class="map-container fade-in delay-3">
+        <div id="businessMap"></div>
+    </div>
+
+    <!-- История операций -->
+    <div class="history-section fade-in delay-4">
+        <h3 class="history-header">
+            <span>История в {{ business.name }}</span>
+            <i class="fas fa-history"></i>
+        </h3>
+        
+        <div class="history-items">
+            {% for item in history %}
+            <div class="history-item">
+                <div class="history-icon">
+                    <i class="fas fa-{{ 'star' if item.amount > 0 else 'coffee' }}"></i>
+                </div>
+                <div class="history-info">
+                    <div class="history-name">{{ item.description }}</div>
+                    <div class="history-date">{{ item.timestamp }}</div>
+                </div>
+                <div class="history-amount {% if item.amount > 0 %}plus{% endif %}">
+                    {% if item.amount > 0 %}+{% else %}-{% endif %}
+                    {{ abs(item.amount) }}{% if item.amount > 0 %} баллов{% else %} ₽{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Модальное окно с бизнесами -->
+    <div id="businessModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Все партнеры</div>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-businesses">
+                {% for biz in other_businesses %}
+                <div class="modal-business-card" onclick="window.location.href='/business/{{ biz.id }}'">
+                    <div class="modal-business-logo" style="background: linear-gradient(135deg, {{ biz.logo_color or '#6F4E37' }}, #D2B48C);">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h4 class="modal-business-name">{{ biz.name }}</h4>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно аналитики -->
+    <div id="analyticsModal" class="modal">
+        <div class="modal-content analytics-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Моя аналитика</div>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="analytics-stats">
+                <div class="analytics-stat">
+                    <div class="analytics-value">{{ stats.total_visits }}</div>
+                    <div class="analytics-label">Всего посещений</div>
+                </div>
+                <div class="analytics-stat">
+                    <div class="analytics-value">{{ stats.monthly_visits }}</div>
+                    <div class="analytics-label">Посещений за месяц</div>
+                </div>
+                <div class="analytics-stat">
+                    <div class="analytics-value">{{ user.balance }}</div>
+                    <div class="analytics-label">Всего баллов</div>
+                </div>
+                <div class="analytics-stat">
+                    <div class="analytics-value">{{ stats.popular_time['hour'] if stats.popular_time else '--:--' }}</div>
+                    <div class="analytics-label">Самое частое время</div>
+                </div>
+            </div>
+            
+            <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--dark);">График посещений по времени</h3>
+            <div class="analytics-chart">
+                <div class="chart-bar" style="height: 30%;" data-time="9:00"></div>
+                <div class="chart-bar" style="height: 60%;" data-time="10:00"></div>
+                <div class="chart-bar" style="height: 90%;" data-time="11:00"></div>
+                <div class="chart-bar" style="height: 45%;" data-time="12:00"></div>
+                <div class="chart-bar" style="height: 30%;" data-time="13:00"></div>
+                <div class="chart-bar" style="height: 75%;" data-time="14:00"></div>
+                <div class="chart-bar" style="height: 60%;" data-time="15:00"></div>
+                <div class="chart-label">Время посещений</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно акций -->
+    <div id="promoModal" class="modal">
+        <div class="modal-content promo-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Специальные предложения</div>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            
+            {% for promo in promos %}
+            <div class="promo-item">
+                {% if promo.badge %}
+                <div class="promo-badge">{{ promo.badge }}</div>
+                {% endif %}
+                <div class="promo-title">{{ promo.title }}</div>
+                <div class="promo-desc">{{ promo.description }}</div>
+                <div class="promo-date">
+                    <i class="far fa-calendar-alt"></i>
+                    {% if promo.end_date %}
+                    До {{ promo.end_date }}
+                    {% else %}
+                    Постоянная акция
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            Главная
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            На карте
+        </a>
+        <a href="/qrcode" class="nav-item">
+            <i class="fas fa-qrcode"></i>
+            QR-код
+        </a>
+        <a href="/profile" class="nav-item">
+            <i class="fas fa-user"></i>
+            Профиль
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Прелоадер
+        document.addEventListener('DOMContentLoaded', function() {
+            const preloader = document.querySelector('.preloader');
+            const progressBar = document.querySelector('.preloader-progress-bar');
+            
+            // Анимация прогресс бара
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        preloader.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }, 500);
+                }
+            }, 100);
+            
+            // Инициализация слайдера
+            const swiper = new Swiper('.swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 15,
+                freeMode: true,
+            });
+            
+            // Анимация прогресс бара уровня
+            const progressFill = document.querySelector('.progress-fill');
+            setTimeout(() => {
+                progressFill.style.width = '{{ (user.progress / 10) }}%';
+            }, 300);
+        });
+
+        // Инициализация карты
+        function initMap() {
+            const map = L.map('businessMap').setView([55.751244, 37.618423], 16);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            const coffeeIcon = L.divIcon({
+                className: 'coffee-marker',
+                html: `<div style="background: {{ business.logo_color or '#6F4E37' }}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-coffee"></i></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            
+            L.marker([55.751244, 37.618423], {icon: coffeeIcon}).addTo(map)
+                .bindPopup('<b>{{ business.name }} на Тверской</b><br>Открыто до 22:00')
+                .openPopup();
+            
+            L.circle([55.751244, 37.618423], {
+                color: '{{ business.logo_color or '#6F4E37' }}',
+                fillColor: '{{ business.logo_color or '#6F4E37' }}',
+                fillOpacity: 0.1,
+                radius: 100
+            }).addTo(map);
+        }
+
+        window.addEventListener('load', initMap);
+
+        // Функции для работы с модальными окнами
+        let currentModal = null;
+
+        function openBusinessModal() {
+            currentModal = document.getElementById('businessModal');
+            currentModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openAnalyticsModal() {
+            currentModal = document.getElementById('analyticsModal');
+            currentModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                const bars = document.querySelectorAll('.chart-bar');
+                bars.forEach(bar => {
+                    bar.style.height = bar.style.height;
+                });
+            }, 300);
+        }
+
+        function openPromoModal() {
+            currentModal = document.getElementById('promoModal');
+            currentModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            if (currentModal) {
+                currentModal.classList.remove('show');
+                currentModal = null;
+                document.body.style.overflow = '';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        }
+
+        // Навигация
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Обновление данных каждые 30 секунд
+        setInterval(() => {
+            fetch(`/api/user/{{ user.user_id }}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.points-count').textContent = `${data.balance} баллов`;
+                    document.querySelector('.progress-fill').style.width = `${data.progress / 10}%`;
+                    document.querySelector('.progress-info span:first-child').textContent = `${data.progress}/1000 баллов`;
+                    document.querySelector('.progress-info span:last-child').textContent = `${data.progress / 10}%`;
+                    document.querySelector('.level-status').textContent = data.level;
+                });
+        }, 30000);
+    </script>
+</body>
+</html>
