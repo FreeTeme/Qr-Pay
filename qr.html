@@ -10,12 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6F4E37; /* Кофейный цвет */
-            --secondary: #D2B48C; /* Бежевый */
-            --dark: #2D3436;
+            --primary: #4361ee; /* Кофейный цвет */
+            --secondary: #4895ef; /* Бежевый */
+            --dark: #1b263b;
             --light: #F9F5F0; /* Светло-бежевый фон */
-            --accent: #C4A484; /* Акцентный бежевый */
-            --business-color: #6F4E37;
+            --accent: #4cc9f0; /* Акцентный бежевый */
+            --business-color: #3f37c9;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
@@ -115,7 +115,7 @@
 
         /* Хедер */
         .business-header {
-            background: linear-gradient(135deg, var(--business-color), #8B5A2B);
+            background: linear-gradient(135deg, var(--business-color), #4cc9f0);
             color: white;
             padding: 30px 20px 40px;
             border-radius: 0 0 30px 30px;
@@ -288,14 +288,15 @@
         }
 
         .add-card .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+
+            width: 40px;
+            height: 40px;
+            border-radius: 20%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
+            margin: 0 auto 5px;
             color: white;
             font-size: 24px;
             transition: var(--transition);
@@ -371,7 +372,7 @@
 
         /* Стиль для карточки "Акции" */
         .promo-card {
-            background: linear-gradient(135deg, #6F4E37, #8B5A2B);
+            background: linear-gradient(135deg, #4361ee, #4895ef);
             color: white;
             position: relative;
             overflow: hidden;
@@ -392,8 +393,8 @@
         .promo-card .card-badge {
             position: absolute;
             top: 15px;
-            right: 15px;
-            background: #D2B48C;
+            right: 5px;
+            background: #e8e5e2;
             color: var(--dark);
             font-weight: 700;
             font-size: 12px;
@@ -1057,9 +1058,9 @@
     <!-- Прелоадер -->
     <div class="preloader">
         <div class="preloader-logo">
-            <i class="fas fa-coffee"></i>
+            <i class="fa-solid fa-qrcode"></i>
         </div>
-        <div class="preloader-text">Coffee Like</div>
+        <div class="preloader-text"><b>QrPay</b></div>
         <div class="preloader-progress">
             <div class="preloader-progress-bar"></div>
         </div>
@@ -1080,6 +1081,8 @@
             <div class="points-label">Накоплено</div>
         </div>
     </header>
+
+<br>
 
     <!-- Новый слайдер с тремя блоками -->
     <div class="dashboard-slider fade-in delay-1">
@@ -1362,11 +1365,11 @@
             <i class="fas fa-map-marker-alt"></i>
             На карте
         </a>
-        <a href="index.html" class="nav-item">
+        <a href="index.html" class="nav-item" onclick="window.location.href='index.html'">
             <i class="fas fa-qrcode"></i>
             QR-код
         </a>
-        <a href="profile.html" class="nav-item">
+        <a href="profile.html" class="nav-item" onclick="window.location.href='profile.html'"> 
             <i class="fas fa-user"></i>
             Профиль
         </a>
@@ -1399,7 +1402,7 @@
             // Инициализация слайдера
             const swiper = new Swiper('.swiper', {
                 slidesPerView: 'auto',
-                spaceBetween: 15,
+                spaceBetween: 5, 
                 freeMode: true,
             });
             

@@ -8,8 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6F4E37;
-            --primary-light: #9A7B61;
+            --primary: #4361ee;
+            --primary-light: #4895ef;
             --secondary: #D2B48C;
             --secondary-light: #E6D5B8;
             --dark: #2D3436;
@@ -1106,13 +1106,13 @@
     </style>
 </head>
 <body>
-    <!-- Хедер -->
+    
     <header class="profile-header">
-        <button class="back-button" onclick="window.history.back()">
-            <i class="fas fa-arrow-left"></i>
-        </button>
+        
         <div class="profile-title">Мой профиль</div>
     </header>
+
+    <br>
 
     <!-- Основной контент -->
     <div class="profile-container">
@@ -1123,9 +1123,9 @@
             </div>
             <h2 class="profile-name">Иван Иванов</h2>
             <p class="profile-phone">+7 (900) 123-45-67</p>
-            <span class="profile-level">
+            <span class="profile-level" style="color: #F9F5F0;">
                 <i class="fas fa-crown" style="margin-right: 8px;"></i>
-                Silver уровень
+                Bronze уровень
             </span>
         </div>
 
@@ -1150,8 +1150,8 @@
         <!-- Бонусный блок -->
         <div class="bonus-card">
             <div class="bonus-content">
-                <h3 class="bonus-title">
-                    <i class="fas fa-gift"></i>
+                <h3 class="bonus-title" style="color: #F9F5F0;">
+                    <i class="fas fa-gift" style="color:#F9F5F0 ;"></i>
                     День рождения
                 </h3>
                 <p class="bonus-text">Укажите дату рождения и получите специальный подарок и двойные бонусы в ваш день рождения!</p>
@@ -1366,15 +1366,15 @@
 
     <!-- Навигация -->
     <nav class="nav-bar">
-        <a href="index1.html" class="nav-item">
+        <a href="qr.html" class="nav-item">
             <i class="fas fa-home"></i>
             Главная
         </a>
-        <a href="#" class="nav-item">
+        <!-- <a href="#" class="nav-item">
             <i class="fas fa-map-marker-alt"></i>
             На карте
-        </a>
-        <a href="index.html" class="nav-item">
+        </a> -->
+        <a href="index.html" class="nav-item" onclick="window.location.href='index.html'">
             <i class="fas fa-qrcode"></i>
             QR-код
         </a>
