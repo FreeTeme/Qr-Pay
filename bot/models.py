@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Float, DateTime, 
-    ForeignKey, Enum, Boolean, Text, JSON
+    ForeignKey, Boolean, Text, JSON
 )
 from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
@@ -21,8 +21,11 @@ class LoyaltyLevel(Base):
     business_id = Column(Integer, ForeignKey('businesses.id'), nullable=True)
     name = Column(String(50), nullable=False)
     min_points = Column(Integer, default=0)
-    rewards = Column(JSON)  # Дополнительные привилегии (например, {"discount": "5%"})
-
+    rewards = Column(JSON)
+    is_default = Column(Boolean, default=False)
+    
+    # Исправленная связь с Business
+    business = relationship("Business", back_populates="levels")
 
 class Promotion(Base):
     __tablename__ = 'promotions'
@@ -34,7 +37,9 @@ class Promotion(Base):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
     is_active = Column(Boolean, default=True)
-
+    
+    # Связь с Business
+    business = relationship("Business", back_populates="promotions")
 
 class User(Base):
     __tablename__ = 'users'
@@ -59,7 +64,6 @@ class User(Base):
             } for ub in self.businesses
         ]
 
-
 class Business(Base):
     __tablename__ = 'businesses'
     
@@ -74,7 +78,6 @@ class Business(Base):
     promotions = relationship("Promotion", back_populates="business")
     clients = relationship("UserBusiness", back_populates="business")
     purchases = relationship("Purchase", back_populates="business")
-
 
 class UserBusiness(Base):
     __tablename__ = 'user_business'
@@ -109,7 +112,6 @@ class UserBusiness(Base):
             LoyaltyLevel(name=DefaultLevel.SILVER.value, min_points=500),
             LoyaltyLevel(name=DefaultLevel.BRONZE.value, min_points=0)
         ]
-
 
 class Purchase(Base):
     __tablename__ = 'purchases'
