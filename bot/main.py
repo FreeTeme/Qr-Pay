@@ -6,7 +6,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from config import BOT_TOKEN, ADMINS, BOT_USERNAME
-from models import Session, User, Business, UserBusiness, Purchase
+from models import  User, Business, UserBusiness, Purchase
 from database import get_user, create_user, get_business
 from qr_utils import generate_qr
 from aiogram.utils.keyboard import InlineKeyboardBuilder
