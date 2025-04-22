@@ -1533,4 +1533,15 @@
         }
     </script>
 </body>
+<script>
+fetch('/api/profile/123456')
+  .then(res => res.json())
+  .then(data => {
+    document.querySelector('.profile-name').textContent = data.full_name;
+    document.querySelector('.profile-phone').textContent = '@' + data.username;
+  });
+
+</script>
+
+
 </html>
