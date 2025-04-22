@@ -20,14 +20,14 @@
             --gray: #adb5bd;
             --gray-dark: #495057;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        
+
         body {
             display: flex;
             min-height: 100vh;
@@ -35,7 +35,7 @@
             color: var(--dark);
             overflow-x: hidden;
         }
-        
+
         /* Улучшенное боковое меню */
         .sidebar {
             width: 280px;
@@ -48,28 +48,28 @@
             z-index: 100;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .sidebar-header {
             padding: 0 1.5rem 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
         }
-        
+
         .sidebar-header img {
             width: 36px;
             margin-right: 12px;
         }
-        
+
         .sidebar-header h2 {
             font-weight: 600;
             font-size: 1.25rem;
         }
-        
+
         .sidebar-menu {
             padding: 1.5rem 0;
         }
-        
+
         .menu-item {
             padding: 0.85rem 1.5rem;
             cursor: pointer;
@@ -81,18 +81,18 @@
             color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
         }
-        
+
         .menu-item:hover {
             background: rgba(255, 255, 255, 0.05);
             color: white;
         }
-        
+
         .menu-item.active {
             background: linear-gradient(90deg, rgba(67, 97, 238, 0.2), transparent);
             color: white;
             border-left: 4px solid var(--primary);
         }
-        
+
         .menu-item.active::before {
             content: '';
             position: absolute;
@@ -102,14 +102,14 @@
             width: 4px;
             background: var(--primary);
         }
-        
+
         .menu-item i {
             margin-right: 12px;
             font-size: 1.1rem;
             width: 24px;
             text-align: center;
         }
-        
+
         /* Основной контент */
         .main-content {
             margin-left: 280px;
@@ -117,7 +117,7 @@
             width: calc(100% - 280px);
             transition: all 0.3s;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -128,24 +128,24 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
-        
+
         .header-left {
             display: flex;
             align-items: center;
         }
-        
+
         .page-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--dark);
         }
-        
+
         .header-actions {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .btn {
             padding: 0.6rem 1rem;
             border-radius: 8px;
@@ -158,27 +158,27 @@
             justify-content: center;
             gap: 0.5rem;
         }
-        
+
         .btn-primary {
             background-color: var(--primary);
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: var(--secondary);
         }
-        
+
         .btn-outline {
             background: transparent;
             border: 1px solid var(--gray);
             color: var(--gray-dark);
         }
-        
+
         .btn-outline:hover {
             border-color: var(--primary);
             color: var(--primary);
         }
-        
+
         .user-avatar {
             width: 40px;
             height: 40px;
@@ -191,7 +191,7 @@
             font-weight: 600;
             cursor: pointer;
         }
-        
+
         /* Карточки статистики */
         .stats-grid {
             display: grid;
@@ -199,7 +199,7 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-        
+
         .stat-card {
             background-color: white;
             border-radius: 12px;
@@ -208,19 +208,19 @@
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(0, 0, 0, 0.03);
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        
+
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        
+
         .stat-icon {
             width: 40px;
             height: 40px;
@@ -230,61 +230,61 @@
             justify-content: center;
             font-size: 1.1rem;
         }
-        
+
         .stat-icon.blue {
             background-color: rgba(67, 97, 238, 0.1);
             color: var(--primary);
         }
-        
+
         .stat-icon.green {
             background-color: rgba(76, 201, 240, 0.1);
             color: var(--success);
         }
-        
+
         .stat-icon.purple {
             background-color: rgba(63, 55, 201, 0.1);
             color: var(--secondary);
         }
-        
+
         .stat-icon.orange {
             background-color: rgba(248, 150, 30, 0.1);
             color: var(--warning);
         }
-        
+
         .stat-title {
             font-size: 0.875rem;
             color: var(--gray-dark);
             font-weight: 500;
             margin-bottom: 0.5rem;
         }
-        
+
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 0.5rem;
         }
-        
+
         .stat-change {
             display: flex;
             align-items: center;
             font-size: 0.875rem;
             font-weight: 500;
         }
-        
+
         .stat-change.positive {
             color: #10b981;
         }
-        
+
         .stat-change.negative {
             color: #ef4444;
         }
-        
+
         .stat-change i {
             margin-right: 0.25rem;
             font-size: 0.75rem;
         }
-        
+
         /* Графики и дополнительные секции */
         .charts-row {
             display: grid;
@@ -292,32 +292,32 @@
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .chart-container {
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
-        
+
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-        
+
         .chart-title {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--dark);
         }
-        
+
         .chart-actions {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .chart-btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
@@ -326,23 +326,23 @@
             border: none;
             cursor: pointer;
         }
-        
+
         .chart-btn.active {
             background: var(--primary);
             color: white;
         }
-        
+
         .chart-wrapper {
             position: relative;
             height: 300px;
         }
-        
+
         .demographics-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
         }
-        
+
         /* Блок информации о пользователях */
         .users-section {
             margin-top: 2rem;
@@ -351,20 +351,20 @@
             padding: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
-        
+
         .users-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-        
+
         .users-title {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--dark);
         }
-        
+
         .users-toggle {
             padding: 0.5rem 1rem;
             background: var(--primary);
@@ -375,11 +375,11 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        
+
         .users-toggle:hover {
             background: var(--secondary);
         }
-        
+
         /* Модальное окно */
         .modal {
             display: none;
@@ -393,7 +393,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -405,7 +405,7 @@
             position: relative;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .modal-close {
             position: absolute;
             top: 1rem;
@@ -416,27 +416,27 @@
             background: none;
             border: none;
         }
-        
+
         .modal-close:hover {
             color: var(--danger);
         }
-        
+
         .modal-header {
             margin-bottom: 1.5rem;
         }
-        
+
         .modal-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--dark);
         }
-        
+
         .search-bar {
             margin-bottom: 1.5rem;
             display: flex;
             gap: 1rem;
         }
-        
+
         .search-input {
             flex: 1;
             padding: 0.75rem 1rem;
@@ -444,7 +444,7 @@
             border-radius: 8px;
             font-size: 1rem;
         }
-        
+
         .search-btn {
             padding: 0.75rem 1.5rem;
             background: var(--primary);
@@ -454,102 +454,102 @@
             cursor: pointer;
             font-weight: 500;
         }
-        
+
         .users-table {
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         .users-table th, .users-table td {
             padding: 1rem;
             text-align: left;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         .users-table th {
             font-weight: 600;
             color: var(--dark);
             background: rgba(0, 0, 0, 0.02);
         }
-        
+
         .users-table tr:hover {
             background: rgba(67, 97, 238, 0.05);
         }
-        
+
         /* Адаптивность */
         @media (max-width: 1200px) {
             .charts-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .demographics-grid {
                 grid-template-columns: 1fr;
             }
         }
-        
+
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.active {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
                 width: 100%;
             }
         }
-        
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            
+
             .modal-content {
                 width: 95%;
                 padding: 1rem;
             }
         }
-        
+
         @media (max-width: 576px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
             }
-            
+
             .header-actions {
                 width: 100%;
                 justify-content: space-between;
             }
-            
+
             .users-table th, .users-table td {
                 padding: 0.5rem;
                 font-size: 0.875rem;
             }
         }
-        
+
         /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .content-section {
             animation: fadeIn 0.3s ease-out;
         }
-        
+
         @keyframes modalFadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .modal-content {
             animation: modalFadeIn 0.3s ease-out;
         }
@@ -637,7 +637,7 @@
         align-items: flex-start;
         gap: 1rem;
     }
-    
+
     .operations-table th,
     .operations-table td {
         padding: 0.75rem;
@@ -818,11 +818,11 @@
         align-items: flex-start;
         gap: 1rem;
     }
-    
+
     .promo-form-container {
         padding: 1rem;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -860,7 +860,7 @@
     <!-- Улучшенное боковое меню -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-           
+
             <h2>QrPay</h2>
         </div>
         <div class="sidebar-menu">
@@ -876,13 +876,13 @@
                 <i class="fas fa-tags"></i>
                 <span>Акции</span>
             </div>
-            <div class="menu-item" data-section="profile" onclick="window.open('lk.html')">
+            <div class="menu-item" data-section="profile" onclick="window.open('/lk')">
                 <i class="fas fa-user-cog"></i>
                 <span>Личный кабинет</span>
             </div>
         </div>
     </div>
-    
+
     <!-- Основной контент -->
     <div class="main-content">
         <div class="header">
@@ -902,7 +902,7 @@
                 <div class="user-avatar">AD</div>
             </div>
         </div>
-        
+
         <!-- Секция статистики -->
         <div class="content-section" id="statistics-section">
             <div class="stats-grid">
@@ -921,7 +921,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -937,7 +937,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -953,7 +953,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -970,7 +970,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-header">
@@ -987,7 +987,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -1003,7 +1003,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -1019,7 +1019,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
@@ -1036,7 +1036,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Графики -->
             <div class="charts-row">
                 <div class="chart-container">
@@ -1052,7 +1052,7 @@
                         <canvas id="salesChart"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="chart-container">
                     <div class="chart-header">
                         <h3 class="chart-title">Новые клиенты</h3>
@@ -1062,7 +1062,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Демографическая аналитика -->
             <div class="demographics-grid">
                 <div class="chart-container">
@@ -1073,7 +1073,7 @@
                         <canvas id="ageChart"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="chart-container">
                     <div class="chart-header">
                         <h3 class="chart-title">Соотношение полов</h3>
@@ -1083,7 +1083,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Блок информации о пользователях -->
             <div class="users-section">
                 <div class="users-header">
@@ -1095,7 +1095,7 @@
                 <p>Нажмите кнопку, чтобы просмотреть подробную информацию о клиентах, включая их покупки, бонусные баллы и другую статистику.</p>
             </div>
         </div>
-        
+
         <!-- Секция операций -->
         <!-- В секции операций заменяем существующий контент на этот -->
 <div class="content-section" id="operations-section" style="display: none;">
@@ -1136,7 +1136,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>120</td>
                     <td>8,700 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>13.07.2024 18:45</td>
@@ -1144,7 +1144,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>50</td>
                     <td>5,300 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>12.07.2024 12:00</td>
@@ -1152,7 +1152,7 @@
                     <td><span class="badge gold">Gold</span></td>
                     <td>300</td>
                     <td>15,800 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>11.07.2024 16:20</td>
@@ -1160,7 +1160,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>180</td>
                     <td>10,200 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>10.07.2024 09:30</td>
@@ -1168,7 +1168,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>75</td>
                     <td>6,500 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>15.07.2024 14:30</td>
@@ -1183,7 +1183,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>120</td>
                     <td>8,700 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>13.07.2024 18:45</td>
@@ -1191,7 +1191,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>50</td>
                     <td>5,300 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>12.07.2024 12:00</td>
@@ -1199,7 +1199,7 @@
                     <td><span class="badge gold">Gold</span></td>
                     <td>300</td>
                     <td>15,800 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>11.07.2024 16:20</td>
@@ -1207,7 +1207,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>180</td>
                     <td>10,200 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>10.07.2024 09:30</td>
@@ -1215,7 +1215,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>75</td>
                     <td>6,500 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>15.07.2024 14:30</td>
@@ -1230,7 +1230,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>120</td>
                     <td>8,700 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>13.07.2024 18:45</td>
@@ -1238,7 +1238,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>50</td>
                     <td>5,300 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>12.07.2024 12:00</td>
@@ -1246,7 +1246,7 @@
                     <td><span class="badge gold">Gold</span></td>
                     <td>300</td>
                     <td>15,800 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>11.07.2024 16:20</td>
@@ -1254,7 +1254,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>180</td>
                     <td>10,200 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>10.07.2024 09:30</td>
@@ -1262,7 +1262,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>75</td>
                     <td>6,500 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>15.07.2024 14:30</td>
@@ -1277,7 +1277,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>120</td>
                     <td>8,700 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>13.07.2024 18:45</td>
@@ -1285,7 +1285,7 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>50</td>
                     <td>5,300 ₽</td>
-                   
+
                 </tr>
                 <tr>
                     <td>12.07.2024 12:00</td>
@@ -1293,7 +1293,7 @@
                     <td><span class="badge gold">Gold</span></td>
                     <td>300</td>
                     <td>15,800 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>11.07.2024 16:20</td>
@@ -1301,7 +1301,7 @@
                     <td><span class="badge silver">Silver</span></td>
                     <td>180</td>
                     <td>10,200 ₽</td>
-                    
+
                 </tr>
                 <tr>
                     <td>10.07.2024 09:30</td>
@@ -1309,14 +1309,14 @@
                     <td><span class="badge bronze">Bronze</span></td>
                     <td>75</td>
                     <td>6,500 ₽</td>
-                   
+
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
-        
-       
+
+
        <!-- Секция акций -->
 <div class="content-section" id="promotions-section" style="display: none;">
     <div class="promotions-header">
@@ -1407,7 +1407,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Дата начала</label>
@@ -1468,14 +1468,14 @@
         </div>
     </div>
 </div>
-        
+
         <!-- Секция личного кабинета -->
         <div class="content-section" id="profile-section" style="display: none;">
             <h2>Личный кабинет</h2>
             <p>Здесь будет отображаться информация личного кабинета</p>
         </div>
     </div>
-    
+
     <!-- Модальное окно информации о пользователях -->
     <div class="modal" id="usersModal">
         <div class="modal-content">
@@ -1517,52 +1517,52 @@
             </table>
         </div>
     </div>
-    
+
     <script>
         // Переключение меню
         document.getElementById('burgerIcon').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
         });
-        
+
         // Переключение между разделами
         const menuItems = document.querySelectorAll('.menu-item');
         const contentSections = document.querySelectorAll('.content-section');
-        
+
         menuItems.forEach(item => {
             item.addEventListener('click', function() {
                 menuItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 contentSections.forEach(section => {
                     section.style.display = 'none';
                 });
-                
+
                 const sectionId = this.getAttribute('data-section') + '-section';
                 document.getElementById(sectionId).style.display = 'block';
                 document.querySelector('.page-title').textContent = this.querySelector('span').textContent;
             });
         });
-        
+
         // Управление модальным окном
         const usersToggle = document.getElementById('usersToggle');
         const usersModal = document.getElementById('usersModal');
         const modalClose = document.getElementById('modalClose');
-        
+
         usersToggle.addEventListener('click', function() {
             usersModal.style.display = 'flex';
         });
-        
+
         modalClose.addEventListener('click', function() {
             usersModal.style.display = 'none';
         });
-        
+
         // Закрытие модального окна при клике вне его
         window.addEventListener('click', function(event) {
             if (event.target === usersModal) {
                 usersModal.style.display = 'none';
             }
         });
-        
+
         // Инициализация графиков
         document.addEventListener('DOMContentLoaded', function() {
             // График динамики продаж
@@ -1604,7 +1604,7 @@
                     }
                 }
             });
-            
+
             // График источников трафика (теперь столбчатая диаграмма)
             const trafficCtx = document.getElementById('trafficChart').getContext('2d');
             const trafficChart = new Chart(trafficCtx, {
@@ -1648,7 +1648,7 @@
                     }
                 }
             });
-            
+
             // График распределения по возрасту
             const ageCtx = document.getElementById('ageChart').getContext('2d');
             const ageChart = new Chart(ageCtx, {
@@ -1685,7 +1685,7 @@
                     }
                 }
             });
-            
+
             // График соотношения полов
             const genderCtx = document.getElementById('genderChart').getContext('2d');
             const genderChart = new Chart(genderCtx, {
@@ -1722,7 +1722,7 @@ function openPromoModal(promoId = null) {
     currentPromoId = promoId;
     const modal = document.getElementById('promoModal');
     const form = document.getElementById('promoForm');
-    
+
     if(promoId) {
         // Заполнение формы данными акции
         modal.querySelector('.modal-title').textContent = 'Редактирование акции';
@@ -1731,7 +1731,7 @@ function openPromoModal(promoId = null) {
         form.reset();
         modal.querySelector('.modal-title').textContent = 'Новая акция';
     }
-    
+
     modal.style.display = 'flex';
 }
 
@@ -1772,7 +1772,7 @@ document.querySelector('.confirm-delete').addEventListener('click', function() {
 // Обработчик отправки формы
 document.getElementById('promoForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const promoData = {
         title: formData.get('title'),
@@ -1783,7 +1783,7 @@ document.getElementById('promoForm').addEventListener('submit', function(e) {
         discount: formData.get('discount'),
         image: formData.get('image')
     };
-    
+
     if(currentPromoId) {
         // Редактирование существующей акции
         console.log('Обновляем акцию:', currentPromoId, promoData);
@@ -1791,7 +1791,7 @@ document.getElementById('promoForm').addEventListener('submit', function(e) {
         // Добавление новой акции
         console.log('Добавляем новую акцию:', promoData);
     }
-    
+
     closeModals();
 });
 

@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .container { max-width: 400px; margin: 100px auto; padding: 20px;
+                    background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #1877f2; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #1877f2; color: white; border: none; border-radius: 5px; }
+        .error { color: #ff0000; margin-top: 10px; }
+    </style>
 </head>
 <body>
-$END$
+    <div class="container">
+        <h1>Авторизация владельца</h1>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <input type="text" name="admin_id" placeholder="Введите ваш ID администратора" required>
+            </div>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
 </body>
 </html>
