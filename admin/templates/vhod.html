@@ -1524,10 +1524,10 @@
                 <p class="hero-subtitle">Truston предоставляет полную историю автомобиля, профессиональную диагностику и персонализированный QR-код для удобного доступа к данным</p>
                 
                 <div class="hero-actions">
-                    <a href="#scanner" class="btn btn-primary">
+                    <a href="#scanner" class="btn btn-primary" onclick="scrollToForm()">
                         <i class="fas fa-qrcode"></i> Зарегистрироаться
                     </a>
-                    <a href="zapis.html" class="btn btn-outline">
+                    <a href="#" class="btn btn-outline" onclick="openLoginModal()">
                         <i class="fas fa-play-circle"></i> Войти
                     </a>
                    
@@ -1677,7 +1677,15 @@
 
 
 
-  
+  <!-- Модальное окно входа -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        <h3>Введите ваш ID</h3>
+        <input type="text" placeholder="ID">
+        <button onclick="closeLoginModal()">Войти</button>
+    </div>
+</div>
 
     <!-- CTA Section -->
     <section class="cta" id="contact">
@@ -1771,6 +1779,31 @@
     </footer>
 
     <script>
+
+          // Прокрутка к форме регистрации
+          function scrollToForm() {
+            document.getElementById('contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Управление модальным окном
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // Закрытие при клике вне окна
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('loginModal')) {
+                closeLoginModal();
+            }
+        }
+
+
         // Header scroll effect
         window.addEventListener('scroll', function() {
             const header = document.getElementById('header');
