@@ -45,7 +45,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--light);
+            background: #000000;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -63,7 +63,7 @@
             width: 80px;
             height: 80px;
             border-radius: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -72,21 +72,21 @@
         }
 
         .preloader-logo i {
-            color: white;
+            color: #000000;
             font-size: 36px;
         }
 
         .preloader-text {
             font-size: 18px;
             font-weight: 500;
-            color: var(--primary);
+            color: white;
             margin-bottom: 30px;
         }
 
         .preloader-progress {
             width: 200px;
             height: 6px;
-            background: rgba(111, 78, 55, 0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
             overflow: hidden;
             position: relative;
@@ -98,7 +98,7 @@
             left: 0;
             height: 100%;
             width: 0;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background: linear-gradient(to right, #f8e8b9, #f2b8e1);
             transition: width 0.3s ease;
             border-radius: 3px;
         }
@@ -235,84 +235,64 @@
         .dashboard-blocks {
             display: flex;
             justify-content: space-between;
-            gap: 2px;
-            padding: 10px 15px;
+            gap: 10px;
+            padding: 0 25px;
             flex-wrap: wrap;
         }
 
         .dashboard-block {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            width: 300px;
-            height: 300px;
+            flex: 1;
+            background: #E8FFE8;
+            border-radius: 16px;
+            min-width: 100px;
+            height: 100px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .dashboard-block:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
         }
 
         .dashboard-block i {
-            font-size: 24px;
-            color: var(--primary);
-            margin-bottom: 10px;
+            font-size: 38px;
+            color: #333333;
         }
 
-        .dashboard-block .value {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 5px;
+        .dashboard-block:nth-child(2) {
+            background: #9F8FD9;
         }
 
-        .dashboard-block .label {
-            font-size: 12px;
-            color: #666;
+        .dashboard-block:nth-child(2) i {
+            color: white;
+        }
+
+        .dashboard-block:nth-child(3) {
+            background: #6A45D9;
+        }
+
+        .dashboard-block:nth-child(3) i {
+            color: white;
+        }
+
+        .dashboard-block:hover {
+            transform: translateY(-3px);
         }
 
         @media (max-width: 768px) {
-            .dashboard-block {
-                width: 250px;
-                height: 250px;
+            .dashboard-blocks {
+                padding: 0 25px;
             }
             .dashboard-block i {
-                font-size: 20px;
-            }
-            .dashboard-block .value {
-                font-size: 14px;
-            }
-            .dashboard-block .label {
-                font-size: 11px;
+                font-size: 34px;
             }
         }
 
         @media (max-width: 480px) {
             .dashboard-blocks {
-                gap: 1px;
-                padding: 5px 10px;
-            }
-            .dashboard-block {
-                width: 150px;
-                height: 150px;
+                padding: 0 25px;
             }
             .dashboard-block i {
-                font-size: 18px;
-            }
-            .dashboard-block .value {
-                font-size: 12px;
-            }
-            .dashboard-block .label {
-                font-size: 10px;
+                font-size: 30px;
             }
         }
 
@@ -467,6 +447,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             backdrop-filter: blur(5px);
+            margin-bottom: 0;
         }
 
         .history-section:hover {
@@ -668,47 +649,111 @@
         /* Модальное окно бизнесов */
         .modal-businesses {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, minmax(140px, 170px));
+            gap: 16px;
+            padding: 10px;
+            justify-content: center;
+            width: 100%;
         }
 
         .modal-business-card {
-            background: #000000;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: var(--shadow-sm);
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            height: 170px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
             transition: var(--transition);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.2);
             color: white;
+            overflow: hidden;
+        }
+
+        /* Градиенты для каждой карточки */
+        .modal-business-card:nth-child(1) {
+            background: #9F8FD9;
+            border: none;
+        }
+
+        .modal-business-card:nth-child(2) {
+            background: #c0b184;
+            border: none;
+        }
+
+        .modal-business-card:nth-child(3) {
+            background:#d27c54;
+            border: none;
+        }
+
+        .modal-business-card:nth-child(4) {
+            background: #6781ae;
+            border: none;
+        }
+
+        .modal-business-card:nth-child(5) {
+            background: linear-gradient(135deg, #0d904f 0%, #0EB159 100%);
+            border: none;
+        }
+
+        .modal-business-card:nth-child(6) {
+            background: #a53028;
+            border: none;
         }
 
         .modal-business-card:hover {
             transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-            background: #111111;
+            filter: brightness(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .modal-business-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #f8e8b9, #f2b8e1);
+            width: 150px;
+            height: px;
+            border-radius: 16px;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
-            color: #000;
-            font-size: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .modal-business-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            padding: 4px;
         }
 
         .modal-business-name {
             font-weight: 500;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            
+            text-align: center;
             color: white;
+            line-height: 1.2;
+            width: 100%;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 480px) {
+            .modal-businesses {
+                gap: 12px;
+                padding: 8px;
+            }
+            
+            .modal-business-card {
+                height: 150px;
+                padding: 15px;
+            }
+
+            .modal-business-logo {
+                width: 85px;
+                height: 85px;
+                margin-bottom: 5px;
+            }
         }
 
         /* Модальное окно аналитики */
@@ -724,7 +769,7 @@
         }
 
         .analytics-stat {
-            background: #000000;
+            background: #1a1a1a;
             border-radius: 15px;
             padding: 15px;
             text-align: center;
@@ -747,7 +792,7 @@
 
         .analytics-chart {
             height: 200px;
-            background: #000000;
+            background: #1a1a1a;
             border-radius: 15px;
             margin-top: 20px;
             position: relative;
@@ -793,25 +838,27 @@
         }
 
         .promo-item {
-            background: #000000;
+            background: #1a1a1a;
             border-radius: 15px;
-            padding: 20px;
+            padding: 0;
             margin-bottom: 15px;
             box-shadow: var(--shadow-sm);
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
             color: white;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .promo-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
+        .promo-item img {
+            width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, #f8e8b9, #f2b8e1);
+            object-fit: cover;
+            border-radius: 15px;
         }
 
         .promo-title {
@@ -931,17 +978,17 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary);
+            background: linear-gradient(to bottom, #f8e8b9, #f2b8e1);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #5a3d2b;
+            background: linear-gradient(to bottom, #f2b8e1, #f8e8b9);
         }
 
         /* Стили для слайдера в хедере */
@@ -1115,13 +1162,7 @@
                 height: 100px;
             }
             .dashboard-block i {
-                font-size: 20px;
-            }
-            .dashboard-block .value {
-                font-size: 14px;
-            }
-            .dashboard-block .label {
-                font-size: 11px;
+                font-size: 34px;
             }
             .swiper-button-next {
                 right: 10px;
@@ -1142,13 +1183,7 @@
                 height: 100px;
             }
             .dashboard-block i {
-                font-size: 18px;
-            }
-            .dashboard-block .value {
-                font-size: 12px;
-            }
-            .dashboard-block .label {
-                font-size: 10px;
+                font-size: 30px;
             }
             .swiper-button-next {
                 right: 5px;
@@ -1159,6 +1194,103 @@
             .scan-button {
                 font-size: 16px;
             }
+        }
+
+        .view-all-button {
+            width: 100%;
+            max-width: 340px;
+            margin: 20px auto 40px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Стили для модального окна истории заказов */
+        .history-modal-content {
+            max-width: 500px;
+        }
+
+        .history-modal-item {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .history-modal-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #f8e8b9, #f2b8e1);
+        }
+
+        .history-modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #f8e8b9;
+            flex-shrink: 0;
+        }
+
+        .history-modal-info {
+            flex: 1;
+        }
+
+        .history-modal-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .history-modal-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .history-modal-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .history-modal-amount.plus {
+            color: #4CAF50;
+        }
+
+        .history-modal-amount.minus {
+            color: #FF5252;
         }
     </style>
 </head>
@@ -1176,9 +1308,9 @@
 
     <!-- Хедер бизнеса -->
     <header class="business-header fade-in">
-        <a href="#" class="back-button">
-            <!-- <i class="fas fa-arrow-left"></i> -->
-        </a>
+<!--         <a href="#" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a> -->
         
         <!-- Слайдер -->
         <div class="header-slider swiper">
@@ -1186,17 +1318,15 @@
                 <!-- Первый слайд - купоны -->
                 <div class="swiper-slide">
                     <div class="coupon-card">
-                        <h2>Ваша персональная скидка в 15%</h2>
-                        <p>Entertainment, Food</p>
+                        <h2>Ваши баллы: {{ points }}</h2>
+                        <p>Vobraz</p>
                         <button class="check-button">Check →</button>
                     </div>
                 </div>
-                
                 <!-- Второй слайд - карточка halva -->
                 <div class="swiper-slide">
-                    <div class="card-container">
-                        <img src="https://www.mtbank.by/upload/Sh/imageCache/036/53f/e97de53f39c45e0255b1f5b0f6085aaa.jpg" alt="Halva Card" class="halva-card">
-                        <div class="card-text">Ваша карта</div>
+                    <div class="card-container" style="padding: 0; background: transparent; box-shadow: none; display: flex; justify-content: center; align-items: center;">
+                        <img src="halvawhite.webp" alt="Halva Card" class="halva-card" style="width: 95%; height: auto; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 0 15px rgba(160, 160, 160, 0.6)) drop-shadow(0 0 15px rgba(180, 180, 180, 0.8));">
                     </div>
                 </div>
             </div>
@@ -1208,7 +1338,7 @@
         </div>
 
         <!-- Кнопка сканирования -->
-        <button class="scan-button">
+        <button class="scan-button" onclick="window.location.href='qr1.html'">
             Scan QR code <i class="fas fa-qrcode"></i>
         </button>
     </header>
@@ -1219,7 +1349,7 @@
     <div class="dashboard-blocks fade-in delay-1">
         <!-- Блок "Плюсик" -->
         <div class="dashboard-block" onclick="openBusinessModal()">
-            <i class="fas fa-plus"></i>
+            <i class="fas fa-shopping-bag"></i>
         </div>
         
         <!-- Блок "Моя аналитика" -->
@@ -1236,17 +1366,23 @@
     <!-- Прогресс уровня -->
     <div class="level-progress fade-in delay-2">
         <div class="level-header">
-            <div class="level-title">Ваш уровень в Coffee Like</div>
-            <div class="level-status">Silver</div>
+            <div class="level-title">Ваш уровень в Vobraz</div>
+            <div class="level-status">{{ progress.current_level_name }}</div>
         </div>
         <div class="progress-container">
             <div class="progress-info">
-                <span>420/1000 баллов</span>
-                <span>42%</span>
+                <span>{{ progress.current_points | int }}/{{ progress.points_to_next | int }} баллов</span>
+                <span>{{ progress.progress_percent }}%</span>
             </div>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: 42%;"></div>
+                <div class="progress-fill" style="width: {{ progress.progress_percent }}%;"></div>
             </div>
+        </div>
+        <div class="level-details" style="margin-top: 15px; font-size: 14px; color: rgba(255, 255, 255, 0.8);">
+            Текущий кэшбэк: {{ progress.current_cashback }}%
+            {% if progress.next_level_name %}
+            <br>Следующий уровень ({{ progress.next_level_name }}): {{ progress.next_cashback }}% кэшбэка
+            {% endif %}
         </div>
     </div>
 
@@ -1272,7 +1408,7 @@
                     <div class="history-name">Американо + круассан</div>
                     <div class="history-date">Сегодня, 10:30</div>
                 </div>
-                <div class="history-amount">- 350 ₽</div>
+                <div class="history-amount">- 13 BYN</div>
             </div>
             
             <!-- Бонус 2 -->
@@ -1296,65 +1432,32 @@
                     <div class="history-name">Латте с сиропом</div>
                     <div class="history-date">Вчера, 18:15</div>
                 </div>
-                <div class="history-amount">- 280 ₽</div>
+                <div class="history-amount">- 7 BYN</div>
             </div>
         </div>
     </div>
+
+    <button class="view-all-button" onclick="openHistoryModal()">
+        Просмотреть все <i class="fas fa-arrow-right"></i>
+    </button>
 
     <!-- Модальное окно с бизнесами -->
     <div id="businessModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Все партнеры</div>
+                <div class="modal-title">Мои магазины</div>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-businesses">
-                <!-- Бизнес 1 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo">
-                        <i class="fas fa-coffee"></i>
+                <div class="modal-businesses">
+                    {% for business in businesses %}
+                    <div class="modal-business-card">
+                        <div class="modal-business-logo">
+                            <img src="{{ url_for('static', filename=business.logo_path) }}" alt="{{ business.name }}">
+                        </div>
+                        <h4 class="modal-business-name">{{ business.name }}</h4>
                     </div>
-                    <h4 class="modal-business-name">Coffee Like</h4>
-                </div>
-                
-                <!-- Бизнес 2 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo" style="background: linear-gradient(135deg, #E74C3C, #E67E22);">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <h4 class="modal-business-name">Burger Heroes</h4>
-                </div>
-                
-                <!-- Бизнес 3 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo" style="background: linear-gradient(135deg, #9B59B6, #8E44AD);">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
-                    <h4 class="modal-business-name">Fashion Store</h4>
-                </div>
-                
-                <!-- Бизнес 4 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo" style="background: linear-gradient(135deg, #1ABC9C, #16A085);">
-                        <i class="fas fa-spa"></i>
-                    </div>
-                    <h4 class="modal-business-name">Beauty Spa</h4>
-                </div>
-                
-                <!-- Бизнес 5 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo" style="background: linear-gradient(135deg, #3498DB, #2980B9);">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <h4 class="modal-business-name">Cinema City</h4>
-                </div>
-                
-                <!-- Бизнес 6 -->
-                <div class="modal-business-card">
-                    <div class="modal-business-logo" style="background: linear-gradient(135deg, #F1C40F, #F39C12);">
-                        <i class="fas fa-pizza-slice"></i>
-                    </div>
-                    <h4 class="modal-business-name">Pizza Italia</h4>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -1410,30 +1513,123 @@
             </div>
             
             <div class="promo-item">
-                <div class="promo-badge">New</div>
-                <div class="promo-title">2 кофе по цене 1</div>
-                <div class="promo-desc">При покупке любого кофе получите второй такой же бесплатно. Акция действует с 8:00 до 12:00.</div>
-                <div class="promo-date">
-                    <i class="far fa-calendar-alt"></i>
-                    До 30 июня
-                </div>
+                <img src="https://static.tildacdn.com/tild3936-3038-4262-b563-636532366561/__.jpg" alt="Акция 1">
             </div>
             
             <div class="promo-item">
-                <div class="promo-title">Бонусные баллы x2</div>
-                <div class="promo-desc">В пятницу и субботу получайте двойные бонусные баллы за каждую покупку.</div>
-                <div class="promo-date">
-                    <i class="far fa-calendar-alt"></i>
-                    Постоянная акция
-                </div>
+                <img src="https://sun9-37.userapi.com/impg/d5nW3hq0V7HUuIJek2vDWpATJd5LsFnXCntGmw/aO7iOAX8_kQ.jpg?size=2160x2160&quality=96&sign=391fcc7d511800d979475c69cb7f9683&type=album" alt="Акция 3">
+                
             </div>
             
             <div class="promo-item">
-                <div class="promo-title">Скидка 20% на выпечку</div>
-                <div class="promo-desc">Специальное предложение на всю выпечку после 18:00.</div>
-                <div class="promo-date">
-                    <i class="far fa-calendar-alt"></i>
-                    До 15 июля
+                <img src="https://static.tildacdn.com/tild3765-6234-4731-a530-626361316266/_.jpg" alt="Акция 2">
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно истории заказов -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content history-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">История заказов</div>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="history-modal-items">
+                <!-- Заказ 1 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Американо + круассан</div>
+                        <div class="history-modal-date">Сегодня, 10:30</div>
+                    </div>
+                    <div class="history-modal-amount minus">- 13 BYN</div>
+                </div>
+
+                <!-- Заказ 2 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Начисление баллов</div>
+                        <div class="history-modal-date">Сегодня, 10:30</div>
+                    </div>
+                    <div class="history-modal-amount plus">+ 50 баллов</div>
+                </div>
+
+                <!-- Заказ 3 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Латте с сиропом</div>
+                        <div class="history-modal-date">Вчера, 18:15</div>
+                    </div>
+                    <div class="history-modal-amount minus">- 7 BYN</div>
+                </div>
+
+                <!-- Заказ 4 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-cookie"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Печенье и капучино</div>
+                        <div class="history-modal-date">Вчера, 15:45</div>
+                    </div>
+                    <div class="history-modal-amount minus">- 8 BYN</div>
+                </div>
+
+                <!-- Заказ 5 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Начисление баллов</div>
+                        <div class="history-modal-date">Вчера, 15:45</div>
+                    </div>
+                    <div class="history-modal-amount plus">+ 42 балла</div>
+                </div>
+
+                <!-- Заказ 6 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Бижутерия</div>
+                        <div class="history-modal-date">2 дня назад, 12:40</div>
+                    </div>
+                    <div class="history-modal-amount minus">- 90 BYN</div>
+                </div>
+
+                <!-- Заказ 7 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-cookie"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Шампунь</div>
+                        <div class="history-modal-date">2 дня назад, 12:20</div>
+                    </div>
+                    <div class="history-modal-amount minus">- 24 BYN</div>
+                </div>
+
+                <!-- Заказ 8 -->
+                <div class="history-modal-item">
+                    <div class="history-modal-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="history-modal-info">
+                        <div class="history-modal-title">Начисление баллов</div>
+                        <div class="history-modal-date">2 дня назад, 12:20</div>
+                    </div>
+                    <div class="history-modal-amount plus">+ 100 баллов</div>
                 </div>
             </div>
         </div>
@@ -1443,13 +1639,13 @@
     <nav class="nav-bar">
         <a href="#" class="nav-item active">
             <i class="fas fa-home"></i>
-            Главная
+            Главная 
         </a>
-        <a href="#" class="nav-item">
+        <!-- <a href="#" class="nav-item">
             <i class="fas fa-map-marker-alt"></i>
             На карте
-        </a>
-        <a href="index.html" class="nav-item" onclick="window.location.href='index.html'">
+        </a> -->
+        <a href="qr1.html" class="nav-item" onclick="window.location.href='qr1.html'">
             <i class="fas fa-qrcode"></i>
             QR-код
         </a>
@@ -1462,6 +1658,28 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+
+function updateProgress() {
+            fetch('/api/progress')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.level-status').textContent = data.current_level_name;
+                    document.querySelector('.progress-info span:first-child').textContent = 
+                        `${Math.floor(data.current_points)}/${Math.floor(data.points_to_next)} баллов`;
+                    document.querySelector('.progress-info span:last-child').textContent = `${data.progress_percent}%`;
+                    document.querySelector('.progress-fill').style.width = `${data.progress_percent}%`;
+                    document.querySelector('.level-details').innerHTML = 
+                        `Текущий кэшбэк: ${data.current_cashback}%` +
+                        (data.next_level_name ? `<br>Следующий уровень (${data.next_level_name}): ${data.next_cashback}% кэшбэка` : '');
+                })
+                .catch(error => console.error('Error fetching progress:', error));
+        }
+
+        setInterval(updateProgress, 10000);
+        updateProgress();
+
+
+
         // Прелоадер
         document.addEventListener('DOMContentLoaded', function() {
             const preloader = document.querySelector('.preloader');
@@ -1559,6 +1777,12 @@
             document.body.style.overflow = 'hidden';
         }
 
+        function openHistoryModal() {
+            currentModal = document.getElementById('historyModal');
+            currentModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
         function closeModal() {
             if (currentModal) {
                 currentModal.classList.remove('show');
@@ -1589,7 +1813,7 @@
                 slidesPerView: 1,
                 spaceBetween: 30,
                 loop: true,
-                autoplay: false,
+                autoplay: false, 
                 pagination: {
                     el: '.swiper-pagination',
                     clickable: true,
@@ -1602,4 +1826,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

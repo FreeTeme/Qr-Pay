@@ -1,0 +1,196 @@
+from flask import Flask, render_template, jsonify
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+import sys
+import os
+
+# Настраиваем путь к директории бота
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../bot')))
+from models import User, Business, UserBusiness, Base
+
+app = Flask(__name__)
+
+# Путь к базе данных
+DATABASE_URL = "sqlite:///../bot/loyalty.db"
+engine = create_engine(DATABASE_URL, echo=False)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+# Модель BusinessProfile (для логотипов)
+class BusinessProfile(Base):
+    __tablename__ = 'business_profiles'
+    business_id = Column(Integer, ForeignKey('businesses.id'), primary_key=True)
+    logo_path = Column(String)
+
+# Модель CashbackLevel
+class CashbackLevel(Base):
+    __tablename__ = 'cashback_levels'
+    id = Column(Integer, primary_key=True)
+    business_id = Column(Integer, ForeignKey('businesses.id'))
+    level_name = Column(String, nullable=False)
+    cashback_percentage = Column(Float, nullable=False)
+    min_purchase_amount = Column(Float, nullable=False)
+
+# Инициализация базы данных
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+@app.route('/')
+def index():
+    session = SessionLocal()
+    try:
+        # Получаем данные пользователя с telegram_id=765843635
+        user = session.query(User).filter_by(telegram_id=765843635).first()
+        if not user:
+            return "Пользователь не найден", 404
+
+        # Получаем бизнес Vobraz
+        vobraz = session.query(Business).filter_by(name='Vobraz').first()
+        if not vobraz:
+            return "Бизнес Vobraz не найден", 404
+
+        # Получаем баллы пользователя для бизнеса Vobraz
+        user_business = session.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
+        points = user_business.points if user_business else 0
+
+        # Получаем уровни кэшбэка для Vobraz
+        levels = session.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
+        if not levels:
+            # Если уровней нет, используем стандартные уровни
+            levels = [
+                CashbackLevel(level_name="Bronze", cashback_percentage=5.0, min_purchase_amount=0.0),
+                CashbackLevel(level_name="Silver", cashback_percentage=10.0, min_purchase_amount=10000.0),
+                CashbackLevel(level_name="Gold", cashback_percentage=15.0, min_purchase_amount=50000.0)
+            ]
+
+        # Находим текущий уровень и следующий уровень
+        current_level = None
+        next_level = None
+        total_purchases = points * vobraz.conversion_rate  # Переводим баллы в сумму покупок
+        for i, level in enumerate(levels):
+            if total_purchases >= level.min_purchase_amount:
+                current_level = level
+            else:
+                if i > 0:
+                    next_level = level
+                break
+        if not next_level and current_level != levels[-1]:
+            next_level = levels[levels.index(current_level) + 1]
+
+        # Вычисляем прогресс
+        progress = {}
+        if next_level:
+            points_needed = (next_level.min_purchase_amount - current_level.min_purchase_amount) / vobraz.conversion_rate
+            points_earned = (total_purchases - current_level.min_purchase_amount) / vobraz.conversion_rate
+            progress_percent = (points_earned / points_needed) * 100 if points_needed > 0 else 100
+            progress = {
+                'current_points': points,
+                'points_to_next': next_level.min_purchase_amount / vobraz.conversion_rate,
+                'progress_percent': round(progress_percent, 1),
+                'current_level_name': current_level.level_name,
+                'current_cashback': current_level.cashback_percentage,
+                'next_level_name': next_level.level_name if next_level else None,
+                'next_cashback': next_level.cashback_percentage if next_level else None
+            }
+        else:
+            progress = {
+                'current_points': points,
+                'points_to_next': current_level.min_purchase_amount / vobraz.conversion_rate,
+                'progress_percent': 100,
+                'current_level_name': current_level.level_name,
+                'current_cashback': current_level.cashback_percentage,
+                'next_level_name': None,
+                'next_cashback': None
+            }
+
+        # Получаем данные о всех бизнесах пользователя для модального окна
+        user_businesses = session.query(UserBusiness).filter_by(user_id=user.id).all()
+        businesses_info = []
+        for ub in user_businesses:
+            business = session.query(Business).get(ub.business_id)
+            profile = session.query(BusinessProfile).filter_by(business_id=ub.business_id).first()
+            logo_path = profile.logo_path if profile else 'default_logo.png'
+            businesses_info.append({
+                'name': business.name,
+                'logo_path': logo_path
+            })
+
+        # Передаем данные в шаблон
+        return render_template('index.html', points=points, businesses=businesses_info, progress=progress)
+    
+    finally:
+        session.close()
+
+@app.route('/api/progress')
+def get_progress():
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter_by(telegram_id=765843635).first()
+        if not user:
+            return jsonify({"error": "Пользователь не найден"}), 404
+
+        vobraz = session.query(Business).filter_by(name='Vobraz').first()
+        if not vobraz:
+            return jsonify({"error": "Бизнес Vobraz не найден"}), 404
+
+        user_business = session.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
+        points = user_business.points if user_business else 0
+
+        levels = session.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
+        if not levels:
+            levels = [
+                CashbackLevel(level_name="Bronze", cashback_percentage=5.0, min_purchase_amount=0.0),
+                CashbackLevel(level_name="Silver", cashback_percentage=10.0, min_purchase_amount=10000.0),
+                CashbackLevel(level_name="Gold", cashback_percentage=15.0, min_purchase_amount=50000.0)
+            ]
+
+        current_level = None
+        next_level = None
+        total_purchases = points * vobraz.conversion_rate
+        for i, level in enumerate(levels):
+            if total_purchases >= level.min_purchase_amount:
+                current_level = level
+            else:
+                if i > 0:
+                    next_level = level
+                break
+        if not next_level and current_level != levels[-1]:
+            next_level = levels[levels.index(current_level) + 1]
+
+        progress = {}
+        if next_level:
+            points_needed = (next_level.min_purchase_amount - current_level.min_purchase_amount) / vobraz.conversion_rate
+            points_earned = (total_purchases - current_level.min_purchase_amount) / vobraz.conversion_rate
+            progress_percent = (points_earned / points_needed) * 100 if points_needed > 0 else 100
+            progress = {
+                'current_points': points,
+                'points_to_next': next_level.min_purchase_amount / vobraz.conversion_rate,
+                'progress_percent': round(progress_percent, 1),
+                'current_level_name': current_level.level_name,
+                'current_cashback': current_level.cashback_percentage,
+                'next_level_name': next_level.level_name if next_level else None,
+                'next_cashback': next_level.cashback_percentage if next_level else None
+            }
+        else:
+            progress = {
+                'current_points': points,
+                'points_to_next': current_level.min_purchase_amount / vobraz.conversion_rate,
+                'progress_percent': 100,
+                'current_level_name': current_level.level_name,
+                'current_cashback': current_level.cashback_percentage,
+                'next_level_name': None,
+                'next_cashback': None
+            }
+
+        return jsonify(progress)
+    finally:
+        session.close()
+
+# Фильтр для форматирования чисел
+@app.template_filter('format_number')
+def format_number(value):
+    return "{:,}".format(int(value)).replace(',', ' ')
+
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True)

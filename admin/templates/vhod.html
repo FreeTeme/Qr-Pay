@@ -1483,6 +1483,108 @@
     }
 
 
+    .modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    overflow: auto;
+    animation: modalFade 0.3s ease;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    margin: 5% auto;
+    width: 90%;
+    max-width: 500px;
+    padding: 40px;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+
+.modal-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    color: var(--light);
+    margin-bottom: 10px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-subtitle {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 25px;
+    color: var(--gray);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close:hover {
+    color: var(--light);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 14px 20px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
     
     </style>
@@ -1504,7 +1606,7 @@
                 </div>
                 
                 <div class="nav-actions">
-                    <a href="#" class="btn btn-outline">Войти</a>
+                    <a href="#" class="btn btn-outline"  onclick="openLoginModal()">Войти</a>
                     <button class="mobile-menu-btn">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -1521,7 +1623,7 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">QrPay</h1>
-                <p class="hero-subtitle">Truston предоставляет полную историю автомобиля, профессиональную диагностику и персонализированный QR-код для удобного доступа к данным</p>
+                <p class="hero-subtitle">QRPay предлагает инновационный подход к взаимодействию с клиентами. Наша платформа объединяет удобные QR-систему лояльности и глубокую аналитику в едином решении. Получайте детальную информацию о Ваших клиентах, статистику о выручке в одном приложении.</p>
                 
                 <div class="hero-actions">
                     <a href="#scanner" class="btn btn-primary" onclick="scrollToForm()">
@@ -1536,7 +1638,7 @@
                 <div class="hero-stats">
                     <div class="stat-item">
                         <div class="stat-number">10K+</div>
-                        <div class="stat-label">Проверенных авто</div>
+                        <div class="stat-label">Клиентов уже в системе</div>
                     </div>
                     <div class="stat-item">
                      
@@ -1548,7 +1650,7 @@
             </div>
             
             <div class="hero-image-container">
-                <img src="https://a.d-cd.net/1rv4Ixg-faI0QGH4pkH4NoDtuKs-960.jpg" alt="Truston App" class="hero-image">
+                <img src="https://static.yoomoney.ru/user-promo/media/tild3266-3133-4363-a331-356336393933__couple.png" alt="Truston App" class="hero-image">
                 <div class="hero-qr">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://truston.ru/demo" alt="Пример QR-кода" width="120">
                 </div>
@@ -1564,26 +1666,26 @@
         <div class="booking-container">
             <div class="booking-content">
                 <span class="badge badge-best">Акция</span>
-                <h2 class="booking-title">Запишитесь на диагностику прямо сейчас!</h2>
-                <p class="booking-subtitle">Получите скидку 20% при записи онлайн и цифровой паспорт автомобиля в подарок</p>
+                <h2 class="booking-title">Успей подключить свой бизнес!</h2>
+                <p class="booking-subtitle">Получите скидку 20% на первый месяц при регистрации</p>
                 
                 <div class="booking-features">
                     <div class="feature">
                         <i class="fas fa-check-circle"></i>
-                        <span>Профессиональные диагносты</span>
+                        <span>Профессиональная аналитика продаж</span>
                     </div>
                     <div class="feature">
                         <i class="fas fa-check-circle"></i>
-                        <span>150+ проверяемых параметров</span>
+                        <span>10+ проверяемых параметров</span>
                     </div>
                     <div class="feature">
                         <i class="fas fa-check-circle"></i>
-                        <span>Персональный QR-код авто</span>
+                        <span>Персональный QR-код</span>
                     </div>
                 </div>
                 
                 <a href="zapis.html" class="btn btn-primary btn-large">
-                    <i class="fas fa-calendar-check"></i> Записаться онлайн
+                    <i class="fas fa-calendar-check"></i> Регистрация
                 </a>
                 
                 <div class="booking-countdown">
@@ -1597,10 +1699,10 @@
             </div>
             
             <div class="booking-image">
-                <img src="https://chestnyexpert.ru/wp-content/uploads/2021/05/3-1.png" alt="Диагностика автомобиля">
+                <img src="https://optim.tildacdn.com/tild3936-6237-4333-a566-316262323166/-/format/webp/6767-42.png" alt="Диагностика автомобиля">
                 <div class="image-badge">
                     <i class="fas fa-star"></i>
-                    <span>Лучшие специалисты</span>
+                    <span>Единая система</span>
                 </div>
             </div>
         </div>
@@ -1612,7 +1714,7 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Возможности Truston</h2>
+                <h2 class="section-title">Возможности QrPay</h2>
                 <p class="section-subtitle">Полный набор инструментов для контроля состояния вашего автомобиля</p>
             </div>
             
@@ -1677,15 +1779,24 @@
 
 
 
-  <!-- Модальное окно входа -->
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeLoginModal()">&times;</span>
-        <h3>Введите ваш ID</h3>
-        <input type="text" placeholder="ID">
-        <button onclick="closeLoginModal()">Войти</button>
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">×</span>
+            <div class="modal-header">
+                <h3 class="modal-title">Авторизация владельца</h3>
+                <p class="modal-subtitle">Введите ваш ID администратора для входа</p>
+            </div>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+            <form method="POST" class="modal-form" action="/">
+                <input type="text" name="admin_id" class="modal-input" placeholder="Введите ваш ID администратора" required>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
     <!-- CTA Section -->
     <section class="cta" id="contact">

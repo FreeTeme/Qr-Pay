@@ -54,9 +54,7 @@
             line-height: 1.5;
         }
         
-        /* Боковое меню */
-         /* Улучшенное боковое меню */
-         .sidebar {
+        .sidebar {
             width: 280px;
             background: linear-gradient(135deg, var(--dark), var(--dark-light));
             color: white;
@@ -129,7 +127,6 @@
             text-align: center;
         }
         
-        /* Основной контент */
         .main-content {
             margin-left: 280px;
             padding: 2rem;
@@ -206,7 +203,6 @@
             border-color: var(--primary);
         }
         
-        /* Стили для личного кабинета */
         .profile-container {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -520,7 +516,6 @@
             border-top: 1px solid var(--medium-gray);
         }
         
-        /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -530,7 +525,6 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
         
-        /* Кастомный селект */
         .select-wrapper {
             position: relative;
         }
@@ -553,7 +547,6 @@
             padding-right: 2.5rem;
         }
         
-        /* Responsive */
         @media (max-width: 1200px) {
             .sidebar {
                 width: 240px;
@@ -609,14 +602,12 @@
     </style>
 </head>
 <body>
-    <!-- Улучшенное боковое меню -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-           
             <h2>QrPay</h2>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item " data-section="statistics" onclick="window.open('/dashboard')">
+            <div class="menu-item" data-section="statistics" onclick="window.open('/dashboard')">
                 <i class="fas fa-chart-pie"></i>
                 <span>Статистика</span>
             </div>
@@ -628,14 +619,13 @@
                 <i class="fas fa-tags"></i>
                 <span>Акции</span>
             </div>
-            <div class="menu-item active" data-section="profile" onclick="window.open('lk.html')">
+            <div class="menu-item active" data-section="profile" onclick="window.location.href='/lk'">
                 <i class="fas fa-user-cog"></i>
                 <span>Личный кабинет</span>
             </div>
         </div>
     </div>
     
-    <!-- Основной контент -->
     <div class="main-content">
         <div class="header">
             <button class="menu-toggle" id="menuToggle" style="display: none;">
@@ -652,12 +642,11 @@
         </div>
         
         <div class="profile-container">
-            <!-- Левое меню -->
             <div class="profile-card">
                 <div class="profile-header">
-                    <img src="https://via.placeholder.com/120/4F46E5/FFFFFF?text=MB" alt="Аватар" class="profile-avatar" id="avatarPreview">
+                    <img src="{{ session['business_info']['profile']['logo_path'] or 'https://via.placeholder.com/120/4F46E5/FFFFFF?text=MB' }}" alt="Аватар" class="profile-avatar" id="avatarPreview">
                     <h3 class="profile-name" id="businessNamePreview">{{ session['business_info']['name'] }}</h3>
-                    <p class="profile-email">business@example.com</p>
+                    <p class="profile-email">{{ session['business_info']['profile']['email'] or 'business@example.com' }}</p>
                 </div>
                 <ul class="profile-menu">
                     <li><a href="#" class="active" data-tab="business-info"><i class="fas fa-store"></i> Информация о бизнесе</a></li>
@@ -673,9 +662,7 @@
                 </div>
             </div>
             
-            <!-- Правая часть - контент -->
             <div class="profile-content">
-                <!-- Информация о бизнесе -->
                 <div class="profile-section" id="business-info-section">
                     <h2 class="section-title">
                         <i class="fas fa-store"></i>
@@ -683,70 +670,71 @@
                     </h2>
                     <p class="section-description">Управляйте основной информацией о вашем бизнесе, которая отображается клиентам.</p>
                     
-                    <div class="avatar-upload">
-                        <img src="https://via.placeholder.com/100/4F46E5/FFFFFF?text=Logo" alt="Логотип" class="avatar-preview" id="logoPreview">
-                        <div class="upload-actions">
-                            <input type="file" id="logoUpload" accept="image/*" style="display: none;">
-                            <button class="btn btn-outline" onclick="document.getElementById('logoUpload').click()">
-                                <i class="fas fa-upload"></i> Загрузить логотип
-                            </button>
-                            <button class="btn btn-outline">
-                                <i class="fas fa-trash-alt"></i> Удалить
-                            </button>
-                            <p style="font-size: 0.75rem; color: var(--gray-dark); margin-top: 0.5rem;">Рекомендуемый размер: 200×200 px, PNG или JPG</p>
+                    <form id="businessProfileForm" enctype="multipart/form-data">
+                        <div class="avatar-upload">
+                            <img src="{{ session['business_info']['profile']['logo_path'] or 'https://via.placeholder.com/100/4F46E5/FFFFFF?text=Logo' }}" alt="Логотип" class="avatar-preview" id="logoPreview">
+                            <div class="upload-actions">
+                                <input type="file" id="logoUpload" name="logo" accept="image/*" style="display: none;">
+                                <button type="button" class="btn btn-outline" onclick="document.getElementById('logoUpload').click()">
+                                    <i class="fas fa-upload"></i> Загрузить логотип
+                                </button>
+                                <button type="button" class="btn btn-outline" onclick="removeLogo()">
+                                    <i class="fas fa-trash-alt"></i> Удалить
+                                </button>
+                                <p style="font-size: 0.75rem; color: var(--gray-dark); margin-top: 0.5rem;">Рекомендуемый размер: 200×200 px, PNG или JPG</p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessName" class="form-label">Название бизнеса</label>
-                        <input type="text" id="businessName" class="form-control" value="Мой бизнес">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessCategory" class="form-label">Категория бизнеса</label>
-                        <div class="select-wrapper">
-                            <select id="businessCategory" class="form-control">
-                                <option>Магазин одежды</option>
-                                <option>Кафе и рестораны</option>
-                                <option>Услуги</option>
-                                <option>Электроника</option>
-                                <option>Другое</option>
-                            </select>
+                        
+                        <div class="form-group">
+                            <label for="businessName" class="form-label">Название бизнеса</label>
+                            <input type="text" id="businessName" name="name" class="form-control" value="{{ session['business_info']['name'] }}">
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessDescription" class="form-label">Описание бизнеса</label>
-                        <textarea id="businessDescription" class="form-control">Мы предлагаем качественные товары и отличный сервис для наших клиентов. Наша миссия - делать вашу жизнь лучше!</textarea>
-                        <p style="font-size: 0.75rem; color: var(--gray-dark); margin-top: 0.5rem;">Максимум 500 символов</p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessAddress" class="form-label">Адрес</label>
-                        <input type="text" id="businessAddress" class="form-control" value="ул. Примерная, 123">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessPhone" class="form-label">Телефон</label>
-                        <input type="tel" id="businessPhone" class="form-control" value="+7 (123) 456-78-90">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="businessWebsite" class="form-label">Вебсайт</label>
-                        <input type="url" id="businessWebsite" class="form-control" placeholder="https://example.com">
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-save"></i> Сохранить изменения
-                        </button>
-                        <button class="btn btn-outline">
-                            Отменить
-                        </button>
-                    </div>
+                        
+                        <div class="form-group">
+                            <label for="businessCategory" class="form-label">Категория бизнеса</label>
+                            <div class="select-wrapper">
+                                <select id="businessCategory" name="category" class="form-control">
+                                    <option value="Магазин одежды" {% if session['business_info']['profile']['category'] == 'Магазин одежды' %}selected{% endif %}>Магазин одежды</option>
+                                    <option value="Кафе и рестораны" {% if session['business_info']['profile']['category'] == 'Кафе и рестораны' %}selected{% endif %}>Кафе и рестораны</option>
+                                    <option value="Услуги" {% if session['business_info']['profile']['category'] == 'Услуги' %}selected{% endif %}>Услуги</option>
+                                    <option value="Электроника" {% if session['business_info']['profile']['category'] == 'Электроника' %}selected{% endif %}>Электроника</option>
+                                    <option value="Другое" {% if session['business_info']['profile']['category'] == 'Другое' %}selected{% endif %}>Другое</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="businessDescription" class="form-label">Описание бизнеса</label>
+                            <textarea id="businessDescription" name="description" class="form-control">{{ session['business_info']['profile']['description'] or 'Мы предлагаем качественные товары и отличный сервис для наших клиентов. Наша миссия - делать вашу жизнь лучше!' }}</textarea>
+                            <p style="font-size: 0.75rem; color: var(--gray-dark); margin-top: 0.5rem;">Максимум 500 символов</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="businessAddress" class="form-label">Адрес</label>
+                            <input type="text" id="businessAddress" name="address" class="form-control" value="{{ session['business_info']['profile']['address'] or 'ул. Примерная, 123' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="businessPhone" class="form-label">Телефон</label>
+                            <input type="tel" id="businessPhone" name="phone" class="form-control" value="{{ session['business_info']['profile']['phone'] or '+7 (123) 456-78-90' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="businessWebsite" class="form-label">Вебсайт</label>
+                            <input type="url" id="businessWebsite" name="website" class="form-control" value="{{ session['business_info']['profile']['website'] or '' }}" placeholder="https://example.com">
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Сохранить изменения
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="resetForm()">
+                                Отменить
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 
-                <!-- Настройки кэшбэка -->
                 <div class="profile-section" id="cashback-settings-section" style="display: none;">
                     <h2 class="section-title">
                         <i class="fas fa-coins"></i>
@@ -754,91 +742,92 @@
                     </h2>
                     <p class="section-description">Настройте проценты кэшбэка для разных уровней лояльности ваших клиентов. Эти настройки влияют на все новые операции.</p>
                     
-                    <div class="cashback-levels">
-                        <div class="cashback-card bronze">
-                            <div class="cashback-header">
-                                <div class="cashback-badge bronze">B</div>
-                                <div>
-                                    <h3 class="cashback-title">Bronze</h3>
-                                    <p class="cashback-description">Базовый уровень для новых клиентов</p>
+                    <form id="cashbackSettingsForm">
+                        <div class="cashback-levels">
+                            <div class="cashback-card bronze">
+                                <div class="cashback-header">
+                                    <div class="cashback-badge bronze">B</div>
+                                    <div>
+                                        <h3 class="cashback-title">Bronze</h3>
+                                        <p class="cashback-description">Базовый уровень для новых клиентов</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Процент кэшбэка</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" max="100" step="0.1" name="bronze_percentage" id="bronze_percentage" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Bronze')|map(attribute='cashback_percentage')|first or 5 }}">
+                                        <span>% от суммы покупки</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Минимальная сумма покупок</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" step="100" name="bronze_min_amount" id="bronze_min_amount" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Bronze')|map(attribute='min_purchase_amount')|first or 0 }}">
+                                        <span>руб. для получения уровня</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Процент кэшбэка</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" max="100" class="form-control" value="5">
-                                    <span>% от суммы покупки</span>
+                            
+                            <div class="cashback-card silver">
+                                <div class="cashback-header">
+                                    <div class="cashback-badge silver">S</div>
+                                    <div>
+                                        <h3 class="cashback-title">Silver</h3>
+                                        <p class="cashback-description">Средний уровень для постоянных клиентов</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Процент кэшбэка</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" max="100" step="0.1" name="silver_percentage" id="silver_percentage" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Silver')|map(attribute='cashback_percentage')|first or 10 }}">
+                                        <span>% от суммы покупки</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Минимальная сумма покупок</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" step="100" name="silver_min_amount" id="silver_min_amount" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Silver')|map(attribute='min_purchase_amount')|first or 10000 }}">
+                                        <span>руб. для получения уровня</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Минимальная сумма покупок</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" class="form-control" value="0">
-                                    <span>руб. для получения уровня</span>
+                            
+                            <div class="cashback-card gold">
+                                <div class="cashback-header">
+                                    <div class="cashback-badge gold">G</div>
+                                    <div>
+                                        <h3 class="cashback-title">Gold</h3>
+                                        <p class="cashback-description">Высший уровень для VIP-клиентов</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Процент кэшбэка</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" max="100" step="0.1" name="gold_percentage" id="gold_percentage" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Gold')|map(attribute='cashback_percentage')|first or 15 }}">
+                                        <span>% от суммы покупки</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Минимальная сумма покупок</label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" step="100" name="gold_min_amount" id="gold_min_amount" class="form-control" value="{{ session['business_info']['cashback_levels']|selectattr('level_name', 'equalto', 'Gold')|map(attribute='min_purchase_amount')|first or 50000 }}">
+                                        <span>руб. для получения уровня</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="cashback-card silver">
-                            <div class="cashback-header">
-                                <div class="cashback-badge silver">S</div>
-                                <div>
-                                    <h3 class="cashback-title">Silver</h3>
-                                    <p class="cashback-description">Средний уровень для постоянных клиентов</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Процент кэшбэка</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" max="100" class="form-control" value="10">
-                                    <span>% от суммы покупки</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Минимальная сумма покупок</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" class="form-control" value="10000">
-                                    <span>руб. для получения уровня</span>
-                                </div>
-                            </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Сохранить настройки
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="resetCashbackForm()">
+                                Сбросить значения
+                            </button>
                         </div>
-                        
-                        <div class="cashback-card gold">
-                            <div class="cashback-header">
-                                <div class="cashback-badge gold">G</div>
-                                <div>
-                                    <h3 class="cashback-title">Gold</h3>
-                                    <p class="cashback-description">Высший уровень для VIP-клиентов</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Процент кэшбэка</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" max="100" class="form-control" value="15">
-                                    <span>% от суммы покупки</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Минимальная сумма покупок</label>
-                                <div class="input-group">
-                                    <input type="number" min="0" class="form-control" value="50000">
-                                    <span>руб. для получения уровня</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-save"></i> Сохранить настройки
-                        </button>
-                        <button class="btn btn-outline">
-                            Сбросить значения
-                        </button>
-                    </div>
+                    </form>
                 </div>
                 
-                <!-- Безопасность -->
                 <div class="profile-section" id="security-section" style="display: none;">
                     <h2 class="section-title">
                         <i class="fas fa-shield-alt"></i>
@@ -882,33 +871,156 @@
                     </div>
                 </div>
                 
-                <!-- Уведомления -->
                 <div class="profile-section" id="notifications-section" style="display: none;">
                     <h2 class="section-title">
                         <i class="fas fa-bell"></i>
                         Настройки уведомлений
                     </h2>
                     <p class="section-description">Управляйте, какие уведомления вы хотите получать и каким способом.</p>
-                    
-                    <!-- Здесь будет контент для раздела уведомлений -->
                 </div>
                 
-                <!-- Интеграции -->
                 <div class="profile-section" id="integrations-section" style="display: none;">
                     <h2 class="section-title">
                         <i class="fas fa-plug"></i>
                         Интеграции
                     </h2>
                     <p class="section-description">Подключите дополнительные сервисы для расширения функциональности.</p>
-                    
-                    <!-- Здесь будет контент для раздела интеграций -->
                 </div>
             </div>
         </div>
     </div>
     
     <script>
-        // Переключение между вкладками
+        // Load initial profile data
+        async function loadProfile() {
+            try {
+                const response = await fetch('/business_profile');
+                const profile = await response.json();
+                
+                document.getElementById('logoPreview').src = profile.logo_path || 'https://via.placeholder.com/100/4F46E5/FFFFFF?text=Logo';
+                document.getElementById('avatarPreview').src = profile.logo_path || 'https://via.placeholder.com/120/4F46E5/FFFFFF?text=MB';
+                document.getElementById('businessName').value = profile.name || '{{ session['business_info']['name'] }}';
+                document.getElementById('businessCategory').value = profile.category || 'Другое';
+                document.getElementById('businessDescription').value = profile.description || '';
+                document.getElementById('businessAddress').value = profile.address || '';
+                document.getElementById('businessPhone').value = profile.phone || '';
+                document.getElementById('businessWebsite').value = profile.website || '';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Load cashback settings
+        async function loadCashbackSettings() {
+            try {
+                const response = await fetch('/cashback_settings');
+                const levels = await response.json();
+                
+                levels.forEach(level => {
+                    if (level.level_name === 'Bronze') {
+                        document.getElementById('bronze_percentage').value = level.cashback_percentage;
+                        document.getElementById('bronze_min_amount').value = level.min_purchase_amount;
+                    } else if (level.level_name === 'Silver') {
+                        document.getElementById('silver_percentage').value = level.cashback_percentage;
+                        document.getElementById('silver_min_amount').value = level.min_purchase_amount;
+                    } else if (level.level_name === 'Gold') {
+                        document.getElementById('gold_percentage').value = level.cashback_percentage;
+                        document.getElementById('gold_min_amount').value = level.min_purchase_amount;
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading cashback settings:', error);
+            }
+        }
+
+        // Business profile form submission
+        document.getElementById('businessProfileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/business_profile', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('Профиль успешно обновлен!');
+                    if (formData.get('logo')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('logoPreview').src = event.target.result;
+                            document.getElementById('avatarPreview').src = event.target.result;
+                        };
+                        reader.readAsDataURL(formData.get('logo'));
+                    }
+                    document.getElementById('businessNamePreview').textContent = formData.get('name');
+                } else {
+                    alert('Ошибка при сохранении профиля: ' + result.message);
+                }
+            } catch (error) {
+                alert('Ошибка при сохранении профиля: ' + error.message);
+            }
+        });
+
+        // Cashback settings form submission
+        document.getElementById('cashbackSettingsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/cashback_settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('Настройки кэшбэка успешно обновлены!');
+                } else {
+                    alert('Ошибка при сохранении настроек кэшбэка: ' + result.message);
+                }
+            } catch (error) {
+                alert('Ошибка при сохранении настроек кэшбэка: ' + error.message);
+            }
+        });
+
+        // Logo upload preview
+        document.getElementById('logoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('logoPreview').src = event.target.result;
+                    document.getElementById('avatarPreview').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remove logo
+        function removeLogo() {
+            document.getElementById('logoUpload').value = '';
+            document.getElementById('logoPreview').src = 'https://via.placeholder.com/100/4F46E5/FFFFFF?text=Logo';
+            document.getElementById('avatarPreview').src = 'https://via.placeholder.com/120/4F46E5/FFFFFF?text=MB';
+        }
+
+        // Reset business profile form
+        function resetForm() {
+            loadProfile();
+        }
+
+        // Reset cashback settings form
+        function resetCashbackForm() {
+            loadCashbackSettings();
+        }
+
+        // Tab switching
         const tabLinks = document.querySelectorAll('.profile-menu a');
         const tabSections = document.querySelectorAll('.profile-section');
         
@@ -916,44 +1028,28 @@
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Удаляем активный класс у всех ссылок
                 tabLinks.forEach(l => l.classList.remove('active'));
-                // Добавляем активный класс к текущей ссылке
                 this.classList.add('active');
                 
-                // Скрываем все секции
                 tabSections.forEach(section => {
                     section.style.display = 'none';
                 });
                 
-                // Показываем выбранную секцию
                 const tabId = this.getAttribute('data-tab') + '-section';
                 document.getElementById(tabId).style.display = 'block';
             });
         });
-        
-        // Загрузка логотипа
-        document.getElementById('logoUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('logoPreview').src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+
+        // Mobile menu toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
         });
-        
-        // Обновление названия бизнеса
-        document.getElementById('businessName').addEventListener('input', function() {
-            document.getElementById('businessNamePreview').textContent = this.value;
+
+        // Load data on page load
+        window.addEventListener('load', function() {
+            loadProfile();
+            loadCashbackSettings();
         });
-        
-        // Мобильное меню
-        
-        
-       
-     
     </script>
 </body>
 </html>
