@@ -23,6 +23,62 @@
             background: linear-gradient(135deg, #e0e7ff, #c3dafe);
         }
 
+        #homeButton {
+            display: none;
+            position: relative;
+            padding: 18px 80px;
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 1;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        #homeButton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        #homeButton:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.6);
+        }
+
+        #homeButton:hover::before {
+            left: 100%;
+        }
+
+        #homeButton:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        #homeButton i {
+            margin-right: 12px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
         #cameraModal {
             display: none;
             position: fixed;
@@ -249,6 +305,10 @@
     </style>
 </head>
 <body>
+    <a href="/" id="homeButton" class="home-button">
+        <i class="fas fa-home"></i>На главную
+    </a>
+
     <div id="cameraModal">
         <video id="cameraFeed" autoplay playsinline></video>
         <canvas id="canvas" style="display: none;"></canvas>
@@ -272,6 +332,7 @@
     </div>
 
     <script>
+        const homeButton = document.getElementById('homeButton');
         const cameraModal = document.getElementById('cameraModal');
         const paymentModal = document.getElementById('paymentModal');
         const cancelBtn = document.getElementById('cancelBtn');
@@ -296,7 +357,10 @@
 
         // Automatically open camera on page load
         window.onload = async () => {
-            if (!checkJsQRLoaded()) return;
+            if (!checkJsQRLoaded()) {
+                showHomeButton();
+                return;
+            }
 
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
@@ -308,6 +372,7 @@
                 payBtn.classList.remove('visible');
                 cancelBtn.style.display = 'block';
                 errorMessage.style.display = 'none';
+                homeButton.style.display = 'none';
 
                 cameraFeed.onloadedmetadata = () => {
                     cameraFeed.play().then(() => {
@@ -316,27 +381,39 @@
                         startQRScanning();
                     }).catch(err => {
                         showError('Не удалось запустить видеопоток: ' + err.message);
+                        showHomeButton();
                     });
                 };
             } catch (err) {
                 showError('Не удалось открыть камеру. Разрешите доступ к камере.');
                 console.error('Ошибка доступа к камере:', err);
+                showHomeButton();
             }
         };
 
+        function showHomeButton() {
+            homeButton.style.display = 'block';
+            cameraModal.style.display = 'none';
+            if (stream) {
+                stopCamera();
+            }
+        }
+
         cancelBtn.addEventListener('click', () => {
             stopCamera();
-            cameraModal.style.display = 'none';
+            showHomeButton();
         });
 
         payBtn.addEventListener('click', () => {
             stopCamera();
             cameraModal.style.display = 'none';
             paymentModal.style.display = 'flex';
+            homeButton.style.display = 'none';
         });
 
         closePaymentBtn.addEventListener('click', () => {
             paymentModal.style.display = 'none';
+            showHomeButton();
         });
 
         function showError(message) {

@@ -1,13 +1,15 @@
 from flask import Flask, render_template, jsonify
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, extract
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 import sys
 import os
+from datetime import datetime
 
 # Настраиваем путь к директории бота
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../bot')))
-from models import User, Business, UserBusiness, Base
+from models import User, Business, UserBusiness, Purchase, Base
 
 app = Flask(__name__)
 
@@ -16,11 +18,12 @@ DATABASE_URL = "sqlite:///../bot/loyalty.db"
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-# Модель BusinessProfile (для логотипов)
+# Модель BusinessProfile
 class BusinessProfile(Base):
     __tablename__ = 'business_profiles'
     business_id = Column(Integer, ForeignKey('businesses.id'), primary_key=True)
     logo_path = Column(String)
+    address = Column(String)
 
 # Модель CashbackLevel
 class CashbackLevel(Base):
@@ -53,10 +56,13 @@ def index():
         user_business = session.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
         points = user_business.points if user_business else 0
 
+        # Получаем профиль Vobraz (для адреса и логотипа)
+        vobraz_profile = session.query(BusinessProfile).filter_by(business_id=vobraz.id).first()
+        address = vobraz_profile.address if vobraz_profile and vobraz_profile.address else "Адрес не указан"
+
         # Получаем уровни кэшбэка для Vobraz
         levels = session.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
         if not levels:
-            # Если уровней нет, используем стандартные уровни
             levels = [
                 CashbackLevel(level_name="Bronze", cashback_percentage=5.0, min_purchase_amount=0.0),
                 CashbackLevel(level_name="Silver", cashback_percentage=10.0, min_purchase_amount=10000.0),
@@ -66,7 +72,7 @@ def index():
         # Находим текущий уровень и следующий уровень
         current_level = None
         next_level = None
-        total_purchases = points * vobraz.conversion_rate  # Переводим баллы в сумму покупок
+        total_purchases = points * vobraz.conversion_rate
         for i, level in enumerate(levels):
             if total_purchases >= level.min_purchase_amount:
                 current_level = level
@@ -115,8 +121,93 @@ def index():
                 'logo_path': logo_path
             })
 
+        # Получаем последние 7 покупок
+        recent_purchases = session.query(Purchase).filter_by(
+            user_id=user.id, business_id=vobraz.id
+        ).order_by(Purchase.created_at.desc()).limit(7).all()
+
+        # Получаем все покупки
+        all_purchases = session.query(Purchase).filter_by(
+            user_id=user.id, business_id=vobraz.id
+        ).order_by(Purchase.created_at.desc()).all()
+
+        # Аналитика
+        # Общее количество посещений
+        total_visits = session.query(Purchase).filter_by(
+            user_id=user.id, business_id=vobraz.id
+        ).count()
+
+        # Посещения в текущем месяце (апрель 2025)
+        current_month_visits = session.query(Purchase).filter(
+            Purchase.user_id == user.id,
+            Purchase.business_id == vobraz.id,
+            extract('year', Purchase.created_at) == 2025,
+            extract('month', Purchase.created_at) == 4
+        ).count()
+
+        # Самое частое время посещений (час)
+        most_frequent_hour_result = session.query(
+            func.strftime('%H', Purchase.created_at).label('hour'),
+            func.count().label('count')
+        ).filter(
+            Purchase.user_id == user.id,
+            Purchase.business_id == vobraz.id
+        ).group_by(
+            func.strftime('%H', Purchase.created_at)
+        ).order_by(
+            func.count().desc()
+        ).first()
+
+        most_frequent_hour = most_frequent_hour_result.hour + ':00' if most_frequent_hour_result else 'Нет данных'
+
+        # Посещения по часам
+        hourly_visits_result = session.query(
+            func.strftime('%H', Purchase.created_at).label('hour'),
+            func.count().label('count')
+        ).filter(
+            Purchase.user_id == user.id,
+            Purchase.business_id == vobraz.id
+        ).group_by(
+            func.strftime('%H', Purchase.created_at)
+        ).all()
+
+        hourly_visits = {f"{h:02d}": 0 for h in range(24)}  # Инициализация всех часов
+        for hour, count in hourly_visits_result:
+            hourly_visits[hour] = count
+
+        # Посещения по дням недели (0=понедельник, 6=воскресенье)
+        weekday_visits_result = session.query(
+            func.strftime('%w', Purchase.created_at).label('weekday'),
+            func.count().label('count')
+        ).filter(
+            Purchase.user_id == user.id,
+            Purchase.business_id == vobraz.id
+        ).group_by(
+            func.strftime('%w', Purchase.created_at)
+        ).all()
+
+        weekday_visits = {str(i): 0 for i in range(7)}  # Инициализация всех дней
+        for weekday, count in weekday_visits_result:
+            # SQLite: 0=воскресенье, 1=понедельник, ..., 6=суббота
+            # Преобразуем в 0=понедельник, ..., 6=воскресенье
+            adjusted_weekday = (int(weekday) + 6) % 7
+            weekday_visits[str(adjusted_weekday)] = count
+
         # Передаем данные в шаблон
-        return render_template('index.html', points=points, businesses=businesses_info, progress=progress)
+        return render_template(
+            'index.html',
+            points=points,
+            businesses=businesses_info,
+            progress=progress,
+            address=address,
+            recent_purchases=recent_purchases,
+            all_purchases=all_purchases,
+            total_visits=total_visits,
+            current_month_visits=current_month_visits,
+            most_frequent_hour=most_frequent_hour,
+            hourly_visits=hourly_visits,
+            weekday_visits=weekday_visits
+        )
     
     finally:
         session.close()
@@ -190,6 +281,18 @@ def get_progress():
 @app.template_filter('format_number')
 def format_number(value):
     return "{:,}".format(int(value)).replace(',', ' ')
+
+# Фильтр для форматирования даты
+@app.template_filter('format_date')
+def format_date(value):
+    if value:
+        return value.strftime('%d.%m.%Y %H:%M')
+    return ''
+
+
+@app.route('/qr')
+def qr():
+    return render_template('qr1.html')
 
 if __name__ == '__main__':
     init_db()

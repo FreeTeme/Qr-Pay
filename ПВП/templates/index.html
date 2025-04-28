@@ -1320,13 +1320,15 @@
                     <div class="coupon-card">
                         <h2>Ваши баллы: {{ points }}</h2>
                         <p>Vobraz</p>
-                        <button class="check-button">Check →</button>
+                        <button class="check-button" onclick="window.location.href='/qr'">Scan →</button>
                     </div>
                 </div>
                 <!-- Второй слайд - карточка halva -->
                 <div class="swiper-slide">
-                    <div class="card-container" style="padding: 0; background: transparent; box-shadow: none; display: flex; justify-content: center; align-items: center;">
-                        <img src="halvawhite.webp" alt="Halva Card" class="halva-card" style="width: 95%; height: auto; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 0 15px rgba(160, 160, 160, 0.6)) drop-shadow(0 0 15px rgba(180, 180, 180, 0.8));">
+                    <div class="coupon-card">
+                        <h2>Ваш кэшбэк:  {{ progress.current_cashback }}%</h2>
+                        <p>Vobraz</p>
+                        <button class="check-button" onclick="window.location.href='/qr'">Scan →</button>
                     </div>
                 </div>
             </div>
@@ -1338,7 +1340,7 @@
         </div>
 
         <!-- Кнопка сканирования -->
-        <button class="scan-button" onclick="window.location.href='qr1.html'">
+        <button class="scan-button" onclick="window.location.href='/qr'">
             Scan QR code <i class="fas fa-qrcode"></i>
         </button>
     </header>
@@ -1381,61 +1383,38 @@
         <div class="level-details" style="margin-top: 15px; font-size: 14px; color: rgba(255, 255, 255, 0.8);">
             Текущий кэшбэк: {{ progress.current_cashback }}%
             {% if progress.next_level_name %}
-            <br>Следующий уровень ({{ progress.next_level_name }}): {{ progress.next_cashback }}% кэшбэка
-            {% endif %}
+            <!-- <br>Следующий уровень ({{ progress.next_level_name }}): {{ progress.next_cashback }}% кэшбэка
+            {% endif %} -->
         </div>
     </div>
 
     <!-- Карта -->
     <div class="map-container fade-in delay-3">
-        <div id="businessMap"></div>
+        <h3>Vobraz на карте</h3>
+        <p class="map-address">{{ address }}</p>
+        <div id="map" style="height: 300px; border-radius: 12px;"></div>
     </div>
 
     <!-- История операций -->
-    <div class="history-section fade-in delay-4">
-        <h3 class="history-header">
-            <span>История в Coffee Like</span>
-            <i class="fas fa-history"></i>
-        </h3>
-        
-        <div class="history-items">
-            <!-- Бонус 1 -->
-            <div class="history-item">
-                <div class="history-icon">
-                    <i class="fas fa-coffee"></i>
+     <!-- История покупок -->
+     <div class="history-section fade-in delay-4">
+        <h3>История покупок</h3>
+        {% if recent_purchases %}
+            {% for purchase in recent_purchases %}
+            <div class="history-info">
+                <div class="history-date">{{ purchase.created_at | format_date }}</div>
+                <div class="history-amount">Сумма: {{ purchase.amount | format_number }} BYN</div>
                 </div>
-                <div class="history-info">
-                    <div class="history-name">Американо + круассан</div>
-                    <div class="history-date">Сегодня, 10:30</div>
-                </div>
-                <div class="history-amount">- 13 BYN</div>
+                <div class="history-amount plus">Баллы: {{ purchase.points_used | format_number }}</div>
             </div>
-            
-            <!-- Бонус 2 -->
-            <div class="history-item">
-                <div class="history-icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="history-info">
-                    <div class="history-name">Начисление баллов</div>
-                    <div class="history-date">Сегодня, 10:30</div>
-                </div>
-                <div class="history-amount plus">50 баллов</div>
-            </div>
-            
-            <!-- Бонус 3 -->
-            <div class="history-item">
-                <div class="history-icon">
-                    <i class="fas fa-coffee"></i>
-                </div>
-                <div class="history-info">
-                    <div class="history-name">Латте с сиропом</div>
-                    <div class="history-date">Вчера, 18:15</div>
-                </div>
-                <div class="history-amount">- 7 BYN</div>
-            </div>
-        </div>
+            {% endfor %}
+        {% else %}
+            <p>Нет покупок</p>
+        {% endif %}
     </div>
+
+            <!-- </div> -->
+
 
     <button class="view-all-button" onclick="openHistoryModal()">
         Просмотреть все <i class="fas fa-arrow-right"></i>
@@ -1473,23 +1452,35 @@
             
             <div class="analytics-stats">
                 <div class="analytics-stat">
-                    <div class="analytics-value">24</div>
+                    <div class="analytics-value">{{ total_visits }}</div>
                     <div class="analytics-label">Всего посещений</div>
                 </div>
                 <div class="analytics-stat">
-                    <div class="analytics-value">5</div>
+                    <div class="analytics-value">{{ current_month_visits }}</div>
                     <div class="analytics-label">Посещений за месяц</div>
                 </div>
                 <div class="analytics-stat">
-                    <div class="analytics-value">420</div>
-                    <div class="analytics-label">Всего баллов</div>
+                    <div class="analytics-value">{{ points }}</div>
+                    <div class="analytics-label">Мои баллы:</div>
                 </div>
                 <div class="analytics-stat">
-                    <div class="analytics-value">10:30</div>
+                    <div class="analytics-value">{{ most_frequent_hour }}</div>
                     <div class="analytics-label">Самое частое время</div>
                 </div>
             </div>
+
             
+            
+            <!-- <h3 style="font-size: 16px; margin: 20px 0 10px;">График посещений по дням недели</h3>
+            <div class="analytics-chart weekday-chart">
+                {% set max_weekday = weekday_visits.values()|max|default(1) %}
+                {% set days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] %}
+                {% for day in range(7) %}
+                {% set height = (weekday_visits[day|string] / max_weekday * 100) if max_weekday > 0 else 0 %}
+                <div class="chart-bar" style="height: {{ height }}%;" data-day="{{ days[day] }}"></div>
+                {% endfor %}
+            </div> -->
+
             <h3 style="font-size: 16px; margin-bottom: 10px;">График посещений по времени</h3>
             <div class="analytics-chart">
                 <div class="chart-bar" style="height: 30%;" data-time="9:00"></div>
@@ -1527,114 +1518,24 @@
         </div>
     </div>
 
-    <!-- Модальное окно истории заказов -->
+    <!-- Модальное окно истории покупок -->
     <div id="historyModal" class="modal">
-        <div class="modal-content history-modal-content">
-            <div class="modal-header">
-                <div class="modal-title">История заказов</div>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
-            </div>
-            
-            <div class="history-modal-items">
-                <!-- Заказ 1 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-coffee"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Американо + круассан</div>
-                        <div class="history-modal-date">Сегодня, 10:30</div>
-                    </div>
-                    <div class="history-modal-amount minus">- 13 BYN</div>
+        <div class="modal-content">
+            <span id="closeHistoryModal" class="close">&times;</span>
+            <h3>Все покупки</h3>
+            {% if all_purchases %}
+                {% for purchase in all_purchases %}
+                <div class="purchase-item">
+                    <span class="purchase-date">{{ purchase.created_at | format_date }}</span>
+                    <span class="purchase-amount">Сумма: {{ purchase.amount | format_number }} BYN</span>
+                    <span class="purchase-points">Баллы: {{ purchase.points_used | format_number }}</span>
                 </div>
-
-                <!-- Заказ 2 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Начисление баллов</div>
-                        <div class="history-modal-date">Сегодня, 10:30</div>
-                    </div>
-                    <div class="history-modal-amount plus">+ 50 баллов</div>
-                </div>
-
-                <!-- Заказ 3 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-coffee"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Латте с сиропом</div>
-                        <div class="history-modal-date">Вчера, 18:15</div>
-                    </div>
-                    <div class="history-modal-amount minus">- 7 BYN</div>
-                </div>
-
-                <!-- Заказ 4 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-cookie"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Печенье и капучино</div>
-                        <div class="history-modal-date">Вчера, 15:45</div>
-                    </div>
-                    <div class="history-modal-amount minus">- 8 BYN</div>
-                </div>
-
-                <!-- Заказ 5 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Начисление баллов</div>
-                        <div class="history-modal-date">Вчера, 15:45</div>
-                    </div>
-                    <div class="history-modal-amount plus">+ 42 балла</div>
-                </div>
-
-                <!-- Заказ 6 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-coffee"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Бижутерия</div>
-                        <div class="history-modal-date">2 дня назад, 12:40</div>
-                    </div>
-                    <div class="history-modal-amount minus">- 90 BYN</div>
-                </div>
-
-                <!-- Заказ 7 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-cookie"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Шампунь</div>
-                        <div class="history-modal-date">2 дня назад, 12:20</div>
-                    </div>
-                    <div class="history-modal-amount minus">- 24 BYN</div>
-                </div>
-
-                <!-- Заказ 8 -->
-                <div class="history-modal-item">
-                    <div class="history-modal-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="history-modal-info">
-                        <div class="history-modal-title">Начисление баллов</div>
-                        <div class="history-modal-date">2 дня назад, 12:20</div>
-                    </div>
-                    <div class="history-modal-amount plus">+ 100 баллов</div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <p>Нет покупок</p>
+            {% endif %}
         </div>
     </div>
-
     <!-- Навигация -->
     <nav class="nav-bar">
         <a href="#" class="nav-item active">
@@ -1645,7 +1546,7 @@
             <i class="fas fa-map-marker-alt"></i>
             На карте
         </a> -->
-        <a href="qr1.html" class="nav-item" onclick="window.location.href='qr1.html'">
+        <a href="qr1.html" class="nav-item" onclick="window.location.href='/qr'">
             <i class="fas fa-qrcode"></i>
             QR-код
         </a>
@@ -1669,8 +1570,7 @@ function updateProgress() {
                     document.querySelector('.progress-info span:last-child').textContent = `${data.progress_percent}%`;
                     document.querySelector('.progress-fill').style.width = `${data.progress_percent}%`;
                     document.querySelector('.level-details').innerHTML = 
-                        `Текущий кэшбэк: ${data.current_cashback}%` +
-                        (data.next_level_name ? `<br>Следующий уровень (${data.next_level_name}): ${data.next_cashback}% кэшбэка` : '');
+                        `Текущий кэшбэк: ${data.current_cashback}%` ;
                 })
                 .catch(error => console.error('Error fetching progress:', error));
         }
@@ -1715,38 +1615,45 @@ function updateProgress() {
             }, 300);
         });
 
-        // Инициализация карты (используем OpenStreetMap)
-        function initMap() {
-            const map = L.map('businessMap').setView([55.751244, 37.618423], 16);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Кастомная иконка
-            const coffeeIcon = L.divIcon({
-                className: 'coffee-marker',
-                html: '<div style="background: #6F4E37; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-coffee"></i></div>',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-            
-            // Добавляем маркер текущего местоположения
-            L.marker([55.751244, 37.618423], {icon: coffeeIcon}).addTo(map)
-                .bindPopup('<b>Coffee Like на Тверской</b><br>Открыто до 22:00')
-                .openPopup();
-            
-            // Добавляем круг для обозначения точности местоположения
-            L.circle([55.751244, 37.618423], {
-                color: '#6F4E37',
-                fillColor: '#6F4E37',
-                fillOpacity: 0.1,
-                radius: 100
-            }).addTo(map);
-        }
+        // Инициализация карты
+        var map = L.map('map').setView([53.9, 27.5667], 12); // Центр Минска по умолчанию
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-        // Инициализируем карту после загрузки страницы
-        window.addEventListener('load', initMap);
+        // Геокодирование адреса
+        var address = "{{ address | safe }}";
+        if (address && address !== "Адрес не указан") {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        map.setView([lat, lon], 15);
+                        // Добавляем маркер
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup('Vobraz<br>' + address)
+                            .openPopup();
+                        // Добавляем круг
+                        L.circle([lat, lon], {
+                            color: '#ff6f61', // Цвет обводки
+                            fillColor: '#ff6f61', // Цвет заливки
+                            fillOpacity: 0.3, // Прозрачность заливки
+                            radius: 100 // Радиус в метрах
+                        }).addTo(map);
+                    } else {
+                        document.querySelector('.map-address').textContent = "Не удалось найти адрес на карте";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error geocoding address:', error);
+                    document.querySelector('.map-address').textContent = "Ошибка загрузки карты";
+                });
+        } else {
+            document.querySelector('.map-address').textContent = "Адрес не указан";
+        }
+         
 
         // Функции для работы с модальными окнами
         let currentModal = null;
