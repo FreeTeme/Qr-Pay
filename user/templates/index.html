@@ -1292,6 +1292,8 @@
         .history-modal-amount.minus {
             color: #FF5252;
         }
+
+        
     </style>
 </head>
 <body>
@@ -1398,20 +1400,20 @@
      <!-- История покупок -->
      <div class="history-section fade-in delay-4">
         <h3>История покупок</h3>
+        <br>
         {% if recent_purchases %}
-            {% for purchase in recent_purchases %}
-            <div class="history-info">
-                <div class="history-date">{{ purchase.created_at | format_date }}</div>
-                <div class="history-amount">Сумма: {{ purchase.amount | format_number }} BYN</div>
+            <!-- Выводим только последние 7 покупок -->
+            {% for purchase in recent_purchases[-7:] %}
+                <div class="history-info">
+                    <div class="history-date">{{ purchase.created_at | format_date }}</div>
+                    <div class="history-amount">Сумма: {{ purchase.amount | format_number }} BYN</div>
+                    <div class="history-amount plus">Баллы: {{ purchase.points_used | format_number }}</div>
                 </div>
-                <div class="history-amount plus">Баллы: {{ purchase.points_used | format_number }}</div>
-            </div>
             {% endfor %}
         {% else %}
             <p>Нет покупок</p>
         {% endif %}
     </div>
-
             <!-- </div> -->
 
 
@@ -1427,11 +1429,11 @@
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-businesses">
-                <div class="modal-businesses">
+                <div class="modal-businesses" style="margin-left: 50px;">
                     {% for business in businesses %}
                     <div class="modal-business-card">
                         <div class="modal-business-logo">
-                            <img src="{{ url_for('static', filename=business.logo_path) }}" alt="{{ business.name }}">
+                            <img src="https://vobraz.by/wp-content/uploads/2022/08/Vobraz-logo-b.png" alt="{{ business.name }}">
                         </div>
                         <h4 class="modal-business-name">{{ business.name }}</h4>
                     </div>
@@ -1503,16 +1505,16 @@
             </div>
             
             <div class="promo-item">
-                <img src="https://static.tildacdn.com/tild3936-3038-4262-b563-636532366561/__.jpg" alt="Акция 1">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQe0VGSafxHDonrvsq4wdBKN1lNOYrFKs6lIKJQ7xZdt-Zse2vMFHQbQ5lCgkMGFRFAHA&usqp=CAU" alt="Акция 1">
             </div>
             
             <div class="promo-item">
-                <img src="https://sun9-37.userapi.com/impg/d5nW3hq0V7HUuIJek2vDWpATJd5LsFnXCntGmw/aO7iOAX8_kQ.jpg?size=2160x2160&quality=96&sign=391fcc7d511800d979475c69cb7f9683&type=album" alt="Акция 3">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0iBMCDgZzNnVVWDSLsp1GEi2wTy-iuytgSA&s" alt="Акция 3">
                 
             </div>
             
             <div class="promo-item">
-                <img src="https://static.tildacdn.com/tild3765-6234-4731-a530-626361316266/_.jpg" alt="Акция 2">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbz0E7-qMSe-PWVuyPgkwch66WHWVHF8MKsw&s" alt="Акция 2">
             </div>
         </div>
     </div>
@@ -1525,7 +1527,7 @@
             {% if all_purchases %}
                 {% for purchase in all_purchases %}
                 <div class="purchase-item">
-                    <span class="purchase-date">{{ purchase.created_at | format_date }}</span>
+                    <!-- <span class="purchase-date">{{ purchase.created_at | format_date }}</span> -->
                     <span class="purchase-amount">Сумма: {{ purchase.amount | format_number }} BYN</span>
                     <span class="purchase-points">Баллы: {{ purchase.points_used | format_number }}</span>
                 </div>
