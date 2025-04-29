@@ -1202,6 +1202,26 @@ transition: var(--transition-slow);
         </form>
       </div>
     </div>
+
+    <!-- Навигация -->
+    <nav class="nav-bar">
+        <a href="/" class="nav-item" onclick="window.location.href='/'">
+            <i class="fas fa-home"></i>
+            Главная 
+        </a>
+        <!-- <a href="#" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            На карте
+        </a> -->
+        <a href="/qr" class="nav-item" onclick="window.location.href='/qr'">
+            <i class="fas fa-qrcode"></i>
+            QR-код
+        </a>
+        <a href="/profile" class="nav-item active" onclick="window.location.href='/profile'"> 
+            <i class="fas fa-user"></i>
+            Профиль
+        </a>
+    </nav>
     
     <script>
     const editModal = document.getElementById('editModal');
