@@ -46,10 +46,13 @@ def get_payment_keyboard(user_id: int, business_id: int):
     )
     return builder.as_markup()
 
+from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, command: Command):
     args = command.args
     session = get_session()
+    
     try:
         if args and args.startswith("business_"):
             try:
@@ -87,6 +90,7 @@ async def cmd_start(message: types.Message, command: Command):
                 session.add(user_business)
                 session.commit()
 
+            # Уведомление админа (как у вас было)
             try:
                 await bot.send_message(
                     chat_id=business.admin_id,
@@ -101,9 +105,28 @@ async def cmd_start(message: types.Message, command: Command):
             except TelegramAPIError as e:
                 logger.error(f"Ошибка отправки уведомления: {str(e)}")
 
+            # 🔥 Отправляем сообщение с кнопкой Web App
+            web_app_url = f"https://ваш-сайт.ru/app?user_id={user.id}&business_id={business.admin_id}"
+            
+            # Вариант 1: Inline-кнопка (появляется под сообщением)
+            # await message.answer(
+            #     "🔗 Вы привязаны к бизнесу. Нажмите кнопку ниже, чтобы открыть приложение:",
+            #     reply_markup=types.InlineKeyboardMarkup().add(
+            #         types.InlineKeyboardButton(
             await message.answer(
                 f"🔗 Вы привязаны к бизнесу: {business.name}\n"
-                f"💰 Ваши баллы: {user_business.points}"
+                f"💰 Ваши баллы: {user_business.points}\n\n"
+                "👇 Нажмите кнопку ниже, чтобы открыть приложение:",
+                reply_markup=ReplyKeyboardMarkup(
+                    keyboard=[
+                        [KeyboardButton(
+                            text="Открыть приложение 🚀",
+                            web_app=WebAppInfo(url=web_app_url))
+                        ]
+                    ],
+                    resize_keyboard=True,  # Адаптирует размер кнопки
+                    
+                )
             )
         else:
             await message.answer("👋 Добро пожаловать!")
@@ -116,8 +139,6 @@ async def cmd_start(message: types.Message, command: Command):
         await message.answer("⚠️ Произошла ошибка")
     finally:
         session.close()
-
-# Остальные обработчики также используют get_session() аналогичным образом.
 
 @dp.message(Command("add_business"))
 async def add_business_start(message: Message, state: FSMContext):

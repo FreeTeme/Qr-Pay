@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request, session
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, extract
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../bot'
 from models import User, Business, UserBusiness, Purchase, Base
 
 app = Flask(__name__)
+app.secret_key = 'your_super_secret_key_here'
 
 # Путь к базе данных
 DATABASE_URL = "sqlite:///../bot/loyalty.db"
@@ -40,28 +41,38 @@ def init_db():
 
 @app.route('/')
 def index():
-    session = SessionLocal()
+    telegram_id = request.args.get('user_id', type=int)
+    business_id= request.args.get('business_id',type=int)
+    if not telegram_id:
+        telegram_id=session['user_id']
+        business_id=session['business_id']
+
+        # return "user_id не указан", 400
+    else:
+        session['user_id'] = telegram_id  # ✅ Сохраняем user_id в сессию
+        session['business_id']=business_id
+
+    db = SessionLocal()
     try:
-        # Получаем данные пользователя с telegram_id=765843635
-        user = session.query(User).filter_by(telegram_id=765843635).first()
+        user = db.query(User).filter_by(telegram_id=telegram_id).first()
         if not user:
             return "Пользователь не найден", 404
 
         # Получаем бизнес Vobraz
-        vobraz = session.query(Business).filter_by(name='Vobraz').first()
+        vobraz = db.query(Business).filter_by(admin_id=business_id).first()
         if not vobraz:
             return "Бизнес Vobraz не найден", 404
 
         # Получаем баллы пользователя для бизнеса Vobraz
-        user_business = session.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
+        user_business = db.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
         points = user_business.points if user_business else 0
 
         # Получаем профиль Vobraz (для адреса и логотипа)
-        vobraz_profile = session.query(BusinessProfile).filter_by(business_id=vobraz.id).first()
+        vobraz_profile = db.query(BusinessProfile).filter_by(business_id=vobraz.id).first()
         address = vobraz_profile.address if vobraz_profile and vobraz_profile.address else "Адрес не указан"
 
         # Получаем уровни кэшбэка для Vobraz
-        levels = session.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
+        levels = db.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
         if not levels:
             levels = [
                 CashbackLevel(level_name="Bronze", cashback_percentage=5.0, min_purchase_amount=0.0),
@@ -110,11 +121,11 @@ def index():
             }
 
         # Получаем данные о всех бизнесах пользователя для модального окна
-        user_businesses = session.query(UserBusiness).filter_by(user_id=user.id).all()
+        user_businesses = db.query(UserBusiness).filter_by(user_id=user.id).all()
         businesses_info = []
         for ub in user_businesses:
-            business = session.query(Business).get(ub.business_id)
-            profile = session.query(BusinessProfile).filter_by(business_id=ub.business_id).first()
+            business = db.query(Business).get(ub.business_id)
+            profile = db.query(BusinessProfile).filter_by(business_id=ub.business_id).first()
             logo_path = profile.logo_path if profile else 'default_logo.png'
             businesses_info.append({
                 'name': business.name,
@@ -122,23 +133,23 @@ def index():
             })
 
         # Получаем последние 7 покупок
-        recent_purchases = session.query(Purchase).filter_by(
+        recent_purchases = db.query(Purchase).filter_by(
             user_id=user.id, business_id=vobraz.id
         ).order_by(Purchase.created_at.desc()).limit(7).all()
 
         # Получаем все покупки
-        all_purchases = session.query(Purchase).filter_by(
+        all_purchases = db.query(Purchase).filter_by(
             user_id=user.id, business_id=vobraz.id
         ).order_by(Purchase.created_at.desc()).all()
 
         # Аналитика
         # Общее количество посещений
-        total_visits = session.query(Purchase).filter_by(
+        total_visits = db.query(Purchase).filter_by(
             user_id=user.id, business_id=vobraz.id
         ).count()
 
         # Посещения в текущем месяце (апрель 2025)
-        current_month_visits = session.query(Purchase).filter(
+        current_month_visits = db.query(Purchase).filter(
             Purchase.user_id == user.id,
             Purchase.business_id == vobraz.id,
             extract('year', Purchase.created_at) == 2025,
@@ -146,7 +157,7 @@ def index():
         ).count()
 
         # Самое частое время посещений (час)
-        most_frequent_hour_result = session.query(
+        most_frequent_hour_result = db.query(
             func.strftime('%H', Purchase.created_at).label('hour'),
             func.count().label('count')
         ).filter(
@@ -161,7 +172,7 @@ def index():
         most_frequent_hour = most_frequent_hour_result.hour + ':00' if most_frequent_hour_result else 'Нет данных'
 
         # Посещения по часам
-        hourly_visits_result = session.query(
+        hourly_visits_result = db.query(
             func.strftime('%H', Purchase.created_at).label('hour'),
             func.count().label('count')
         ).filter(
@@ -176,7 +187,7 @@ def index():
             hourly_visits[hour] = count
 
         # Посещения по дням недели (0=понедельник, 6=воскресенье)
-        weekday_visits_result = session.query(
+        weekday_visits_result = db.query(
             func.strftime('%w', Purchase.created_at).label('weekday'),
             func.count().label('count')
         ).filter(
@@ -210,7 +221,80 @@ def index():
         )
     
     finally:
-        session.close()
+        db.close()
+
+@app.route('/profile')
+def profile_page():
+    if 'user_id' not in session:
+        return "Нет доступа. Пользователь не авторизован.", 401
+    return render_template('profile.html')  # Файл profile.html должен быть в templates/
+
+
+# ================== API: Получение, обновление и удаление профиля ==================
+
+@app.route('/api/profile')
+def get_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Не авторизован'}), 401
+
+    session_db = SessionLocal()
+    try:
+        user = session_db.query(User).filter_by(telegram_id=int(user_id)).first()
+        if not user:
+            return jsonify({'error': 'Пользователь не найден'}), 404
+
+        return jsonify({
+            'fullName': user.full_name,
+            'phone': user.username,
+            'birthDate': user.registration_date.strftime('%Y-%m-%d') if user.registration_date else None
+        })
+    finally:
+        session_db.close()
+
+
+@app.route('/api/profile/update', methods=['POST'])
+def update_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Не авторизован'}), 401
+
+    data = request.json
+    session_db = SessionLocal()
+    try:
+        user = session_db.query(User).filter_by(telegram_id=int(user_id)).first()
+        if not user:
+            return jsonify({'error': 'Пользователь не найден'}), 404
+
+        user.full_name = data.get('fullName', user.full_name)
+        user.username = data.get('phone', user.username)
+        if data.get('birthDate'):
+            user.registration_date = datetime.strptime(data['birthDate'], '%Y-%m-%d')
+
+        session_db.commit()
+        return '', 204
+    finally:
+        session_db.close()
+
+
+@app.route('/api/profile/delete', methods=['DELETE'])
+def delete_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Не авторизован'}), 401
+
+    session_db = SessionLocal()
+    try:
+        user = session_db.query(User).filter_by(telegram_id=int(user_id)).first()
+        if not user:
+            return jsonify({'error': 'Пользователь не найден'}), 404
+
+        session_db.delete(user)
+        session_db.commit()
+        session.pop('user_id', None)
+        return '', 204
+    finally:
+        session_db.close()
 
 @app.route('/api/progress')
 def get_progress():
