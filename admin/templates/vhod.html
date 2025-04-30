@@ -1637,7 +1637,7 @@
                 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <div class="stat-number">10K+</div>
+                        <div class="stat-number">5K+</div>
                         <div class="stat-label">Клиентов уже в системе</div>
                     </div>
                     <div class="stat-item">
@@ -1684,7 +1684,7 @@
                     </div>
                 </div>
                 
-                <a href="zapis.html" class="btn btn-primary btn-large">
+                <a href="#" class="btn btn-primary btn-large" onclick="scrollToForm()">
                     <i class="fas fa-calendar-check"></i> Регистрация
                 </a>
                 
@@ -1715,7 +1715,7 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Возможности QrPay</h2>
-                <p class="section-subtitle">Полный набор инструментов для контроля состояния вашего автомобиля</p>
+                <p class="section-subtitle">Полный набор инструментов в одной программе</p>
             </div>
             
             <div class="features-grid">
@@ -1723,18 +1723,18 @@
                     <div class="feature-icon">
                         <i class="fas fa-car-crash"></i>
                     </div>
-                    <h3 class="feature-title">Полная диагностика</h3>
-                    <p class="feature-desc">Профессиональная проверка всех систем автомобиля с детальным отчетом</p>
-                    <a href="#" class="btn btn-glass">Подробнее</a>
+                    <h3 class="feature-title">Полная аналитика</h3>
+                    <p class="feature-desc">Портрет покупателя, графики продаж</p>
+                    <a href="#" class="btn btn-glass" onclick="scrollToForm()">Подробнее</a>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-history"></i>
                     </div>
-                    <h3 class="feature-title">История обслуживания</h3>
-                    <p class="feature-desc">Все сервисные записи и ремонты в одном месте с привязкой к пробегу</p>
-                    <a href="#" class="btn btn-glass">Подробнее</a>
+                    <h3 class="feature-title">История покупок</h3>
+                    <p class="feature-desc">История всех транзакций, подсчет прибыли и затрат</p>
+                    <a href="#" class="btn btn-glass" onclick="scrollToForm()">Подробнее</a>
                 </div>
                 
                 <div class="feature-card">
@@ -1742,28 +1742,28 @@
                         <i class="fas fa-bolt"></i>
                     </div>
                     <h3 class="feature-title">Мониторинг состояния</h3>
-                    <p class="feature-desc">Регулярные уведомления о необходимости ТО или потенциальных проблемах</p>
-                    <a href="#" class="btn btn-glass">Подробнее</a>
+                    <p class="feature-desc">Регулярные уведомления, настройки рассылок</p>
+                    <a href="#" class="btn btn-glass" onclick="scrollToForm()">Подробнее</a>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="feature-title">Анализ стоимости</h3>
-                    <p class="feature-desc">Оценка рыночной стоимости с учетом состояния и истории автомобиля</p>
-                    <a href="#" class="btn btn-glass">Подробнее</a>
+                    <h3 class="feature-title">Настройка акций</h3>
+                    <p class="feature-desc">НАстройка персональных акций для своих клиентов</p>
+                    <a href="#" class="btn btn-glass" onclick="scrollToForm()">Подробнее</a>
                 </div>
                 
-                <div class="feature-card">
+                <!-- <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <h3 class="feature-title">Гарантия подлинности</h3>
                     <p class="feature-desc">Защита от подделки данных с использованием блокчейн-технологий</p>
                     <a href="#" class="btn btn-glass">Подробнее</a>
-                </div>
-                
+                </div> -->
+<!--                 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-exchange-alt"></i>
@@ -1771,7 +1771,7 @@
                     <h3 class="feature-title">Простая продажа</h3>
                     <p class="feature-desc">Подготовьте автомобиль к продаже за несколько кликов с полной историей</p>
                     <a href="#" class="btn btn-glass">Подробнее</a>
-                </div>
+                </div> -->
            
         </div>
     </section>
@@ -1802,8 +1802,8 @@
     <section class="cta" id="contact">
         <div class="container" >
             <div class="cta-container"  style="border: solid #6366f1;">
-                <h2 class="cta-title">Готовы узнать правду о своем автомобиле?</h2>
-                <p class="cta-subtitle">Оставьте заявку и наш менеджер свяжется с вами для записи на диагностику</p>
+                <h2 class="cta-title">Готовы начать?</h2>
+                <p class="cta-subtitle">Оставьте заявку и наш менеджер свяжется с вами для консультации и внедрения</p>
                 
                 <div class="cta-form">
                     <form id="contactForm">
@@ -1816,11 +1816,11 @@
                             <input type="tel" id="phone" class="form-input" placeholder="+375 (29) 1212 123" required>
                         </div>
                         <div class="form-group">
-                            <label for="car" class="form-label">Марка и модель автомобиля</label>
+                            <label for="car" class="form-label">Ваш телеграм</label>
                             <input type="text" id="car" class="form-input" placeholder="Toyota Camry 2018">
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="window.location.href='zapis.html'">
-                            <i class="fas fa-car"></i> Записаться на диагностику
+                             Записаться на консультацию
                         </button>
                     </form>
                 </div>
@@ -1828,7 +1828,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -1883,11 +1883,11 @@
                 </div>
             </div>
             
-            <!-- <div class="footer-bottom">
+            <!<div class="footer-bottom">
                 <p>&copy; 2023 Truston. Все права защищены.</p>
             </div> -->
-        </div>
-    </footer>
+        <!-- </div>
+    </footer> --> 
 
     <script>
 

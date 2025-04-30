@@ -1121,15 +1121,15 @@ transition: var(--transition-slow);
       </div>
     
       <div class="profile-progress">
-        <div class="progress-circle">
+        <!-- <div class="progress-circle">
           <div class="progress-circle-bg">
             <div class="progress-circle-fill" id="progressFill"></div>
           </div>
           <div class="progress-circle-text" id="progressText">0%</div>
-        </div>
+        </div> -->
         <div class="progress-info">
           <h3 class="progress-title">Заполните профиль</h3>
-          <p class="progress-text">Получите 10 бонусных баллов за полную информацию о себе</p>
+          <p class="progress-text">Заполни профиль, чтобы получать персональные акции</p>
           <button class="progress-btn" onclick="openEditModal()">
             <i class="fas fa-pen"></i>
             Заполнить профиль
@@ -1222,6 +1222,27 @@ transition: var(--transition-slow);
             Профиль
         </a>
     </nav>
+
+
+    <!-- Добавьте этот код перед закрывающим тегом </body> -->
+<div id="comingSoonModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Coming Soon</div>
+        <button class="close-modal" onclick="closeComingSoonModal()">&times;</button>
+      </div>
+      <div style="text-align: center; padding: 30px 0;">
+        <i class="fas fa-cogs" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+        <h3 style="color: var(--text-primary); margin-bottom: 15px;">Функция в разработке</h3>
+        <p style="color: var(--text-secondary);">Эта функция появится в одном из следующих обновлений приложения.</p>
+      </div>
+      <button class="form-submit" onclick="closeComingSoonModal()">
+        <i class="fas fa-thumbs-up"></i>
+        Понятно
+      </button>
+    </div>
+  </div>
+
     
     <script>
     const editModal = document.getElementById('editModal');
@@ -1257,6 +1278,28 @@ transition: var(--transition-slow);
       }
     }
     
+
+function showComingSoonModal() {
+  document.getElementById('comingSoonModal').classList.add('show');
+}
+
+function closeComingSoonModal() {
+  document.getElementById('comingSoonModal').classList.remove('show');
+}
+
+function toggleDarkMode() {
+  showComingSoonModal();
+  // Реальная реализация темной темы может быть здесь
+}
+
+// Обновите обработчики кликов для соответствующих кнопок
+document.querySelectorAll('.settings-item').forEach(item => {
+  if (item.querySelector('.fa-bell') || item.querySelector('.fa-lock') || item.querySelector('.fa-moon')) {
+    item.onclick = showComingSoonModal;
+  }
+});
+
+
     function openEditModal() {
       editModal.classList.add('show');
     }
