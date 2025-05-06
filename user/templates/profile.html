@@ -1120,8 +1120,13 @@ transition: var(--transition-slow);
         <p class="profile-phone" id="profilePhone">Телефон</p>
       </div>
     
+<<<<<<< HEAD
       <div class="profile-progress">
         <!-- <div class="progress-circle">
+=======
+      <!-- <div class="profile-progress">
+        <div class="progress-circle">
+>>>>>>> 1115ebf (сервер)
           <div class="progress-circle-bg">
             <div class="progress-circle-fill" id="progressFill"></div>
           </div>
@@ -1135,11 +1140,11 @@ transition: var(--transition-slow);
             Заполнить профиль
           </button>
         </div>
-      </div>
+      </div> -->
     
       <div class="settings-section">
         <h3 class="section-title">Настройки и аккаунт</h3>
-        <div class="settings-item" onclick="showToast('Настройки уведомлений открыты', 'info')">
+        <div class="settings-item" onclick="showToast('Coming soon', 'info')">
           <div class="settings-icon"><i class="fas fa-bell"></i></div>
           <div class="settings-info">
             <div class="settings-name">Уведомления</div>
@@ -1147,7 +1152,7 @@ transition: var(--transition-slow);
           </div>
           <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
-        <div class="settings-item" onclick="showToast('Настройки безопасности открыты', 'info')">
+        <div class="settings-item" onclick="showToast('Coming soon', 'info')">
           <div class="settings-icon"><i class="fas fa-lock"></i></div>
           <div class="settings-info">
             <div class="settings-name">Безопасность</div>
@@ -1209,14 +1214,10 @@ transition: var(--transition-slow);
             <i class="fas fa-home"></i>
             Главная 
         </a>
-        <!-- <a href="#" class="nav-item">
-            <i class="fas fa-map-marker-alt"></i>
-            На карте
-        </a> -->
-        <a href="/qr" class="nav-item" onclick="window.location.href='/qr'">
+        <!-- <a href="/qr" class="nav-item" onclick="window.location.href='/qr'">
             <i class="fas fa-qrcode"></i>
             QR-код
-        </a>
+        </a> -->
         <a href="/profile" class="nav-item active" onclick="window.location.href='/profile'"> 
             <i class="fas fa-user"></i>
             Профиль
@@ -1253,23 +1254,71 @@ transition: var(--transition-slow);
     const totalFields = 4;
     let darkMode = false;
     
+    // Функция для загрузки данных из localStorage
+    function loadFromLocalStorage() {
+      const savedData = localStorage.getItem('profileData');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('profileName').textContent = data.fullName || 'Имя';
+        document.getElementById('profilePhone').textContent = data.phone || 'Телефон';
+        document.getElementById('avatar').textContent = data.fullName ? data.fullName.charAt(0) : 'И';
+        if (data.birthDate) {
+          document.getElementById('birthDate').value = data.birthDate;
+        }
+        
+        // Обновляем поля в модальном окне
+        document.getElementById('fullName').value = data.fullName || '';
+        document.getElementById('phone').value = data.phone || '';
+        
+        return true;
+      }
+      return false;
+    }
+    
     async function loadProfile() {
-      const res = await fetch('/api/profile');
-      if (!res.ok) return;
-      const data = await res.json();
-      document.getElementById('profileName').textContent = data.fullName;
-      document.getElementById('profilePhone').textContent = data.phone;
-      document.getElementById('avatar').textContent = data.fullName.charAt(0);
-      if (data.birthDate) {
-        document.getElementById('birthDate').value = data.birthDate;
+      try {
+        const res = await fetch('/api/profile');
+        if (!res.ok) throw new Error('Ошибка загрузки профиля');
+        
+        const data = await res.json();
+        
+        // Сохраняем данные в localStorage
+        localStorage.setItem('profileData', JSON.stringify(data));
+        
+        // Обновляем UI
+        document.getElementById('profileName').textContent = data.fullName || 'Имя';
+        document.getElementById('profilePhone').textContent = data.phone || 'Телефон';
+        document.getElementById('avatar').textContent = data.fullName ? data.fullName.charAt(0) : 'И';
+        if (data.birthDate) {
+          document.getElementById('birthDate').value = data.birthDate;
+        }
+        
+        // Обновляем поля в модальном окне
+        document.getElementById('fullName').value = data.fullName || '';
+        document.getElementById('phone').value = data.phone || '';
+        
+        // Обновляем прогресс
+        updateProgress();
+      } catch (error) {
+        console.error('Ошибка при загрузке профиля:', error);
       }
     }
     
     function updateProgress() {
+      const savedData = localStorage.getItem('profileData');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        filledFields = 1; // базовое значение
+        
+        if (data.fullName && data.fullName.trim() !== '') filledFields++;
+        if (data.phone && data.phone.trim() !== '') filledFields++;
+        if (data.birthDate) filledFields++;
+      }
+
       const percent = Math.round((filledFields / totalFields) * 100);
       progressFill.style.background = `conic-gradient(var(--primary) 0% ${percent}%, var(--light) ${percent}% 100%)`;
       progressText.textContent = `${percent}%`;
-    
+
       if (percent === 100) {
         document.querySelector('.progress-title').textContent = 'Профиль заполнен!';
         document.querySelector('.progress-text').textContent = 'Вы получили 10 бонусных баллов!';
@@ -1301,6 +1350,15 @@ document.querySelectorAll('.settings-item').forEach(item => {
 
 
     function openEditModal() {
+      // Заполняем модальное окно текущими данными
+      const savedData = localStorage.getItem('profileData');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('fullName').value = data.fullName || '';
+        document.getElementById('phone').value = data.phone || '';
+        document.getElementById('birthDate').value = data.birthDate || '';
+      }
+      
       editModal.classList.add('show');
     }
     
@@ -1313,34 +1371,87 @@ document.querySelectorAll('.settings-item').forEach(item => {
       const phone = document.getElementById('phone').value;
       const birthDate = document.getElementById('birthDate').value;
     
-      const res = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, phone, birthDate })
-      });
-      if (res.ok) {
-        closeModal();
-        loadProfile();
-        showToast('Профиль обновлен!', 'success');
-      } else {
+      try {
+        const res = await fetch('/api/profile/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName, phone, birthDate })
+        });
+        
+        if (res.ok) {
+          // Сохраняем обновленные данные
+          const newData = { fullName, phone, birthDate };
+          localStorage.setItem('profileData', JSON.stringify(newData));
+          
+          closeModal();
+          loadProfile(); // Обновляем интерфейс
+          showToast('Профиль обновлен!', 'success');
+        } else {
+          throw new Error('Ошибка сервера');
+        }
+      } catch (error) {
+        console.error('Ошибка при сохранении профиля:', error);
         showToast('Ошибка обновления!', 'error');
       }
     }
     
     async function logout() {
       if (confirm('Вы уверены, что хотите удалить свою учетную запись?')) {
-        const res = await fetch('/api/profile/delete', { method: 'DELETE' });
-        if (res.ok) {
-          window.location.href = '/login';
+        try {
+          const res = await fetch('/api/profile/delete', { method: 'DELETE' });
+          if (res.ok) {
+            // Очищаем localStorage при выходе
+            localStorage.removeItem('profileData');
+            window.location.href = '/login';
+          } else {
+            throw new Error('Ошибка сервера');
+          }
+        } catch (error) {
+          console.error('Ошибка при выходе:', error);
+          showToast('Coming soon', 'error');
         }
       }
     }
     
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+      `;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
+    
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+      localStorage.setItem('darkMode', darkMode);
+      showToast('Coming soon', 'info');
+    }
+    
+    // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
+      // Сначала пробуем загрузить из localStorage
+      if (!loadFromLocalStorage()) {
+        // Если нет сохраненных данных, загружаем с сервера
+        loadProfile();
+      }
+      
+      // Проверяем сохраненную тему
+      if (localStorage.getItem('darkMode') === 'true') {
+        toggleDarkMode();
+      }
+      
+      // Обновляем прогресс
       updateProgress();
-      loadProfile();
     });
     </script>
-    
-    </body>
+</body>
 </html>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, session, Blueprint
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, extract
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,6 +6,7 @@ from sqlalchemy.sql import func
 import sys
 import os
 from datetime import datetime
+from admin.app import bisness
 
 # Настраиваем путь к директории бота
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../bot')))
@@ -13,6 +14,8 @@ from models import User, Business, UserBusiness, Purchase, Base
 
 app = Flask(__name__)
 app.secret_key = 'your_super_secret_key_here'
+
+app.register_blueprint(bisness)
 
 # Путь к базе данных
 DATABASE_URL = "sqlite:///../bot/loyalty.db"
@@ -298,20 +301,21 @@ def delete_profile():
 
 @app.route('/api/progress')
 def get_progress():
-    session = SessionLocal()
+    telegram_id=session['user_id']
+    session_db = SessionLocal()
     try:
-        user = session.query(User).filter_by(telegram_id=765843635).first()
+        user = session_db.query(User).filter_by(telegram_id=telegram_id).first()
         if not user:
             return jsonify({"error": "Пользователь не найден"}), 404
 
-        vobraz = session.query(Business).filter_by(name='Vobraz').first()
+        vobraz = session_db.query(Business).filter_by(name='Vobraz').first()
         if not vobraz:
             return jsonify({"error": "Бизнес Vobraz не найден"}), 404
 
-        user_business = session.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
+        user_business = session_db.query(UserBusiness).filter_by(user_id=user.id, business_id=vobraz.id).first()
         points = user_business.points if user_business else 0
 
-        levels = session.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
+        levels = session_db.query(CashbackLevel).filter_by(business_id=vobraz.id).order_by(CashbackLevel.min_purchase_amount).all()
         if not levels:
             levels = [
                 CashbackLevel(level_name="Bronze", cashback_percentage=5.0, min_purchase_amount=0.0),
@@ -359,7 +363,7 @@ def get_progress():
 
         return jsonify(progress)
     finally:
-        session.close()
+        session_db.close()
 
 # Фильтр для форматирования чисел
 @app.template_filter('format_number')

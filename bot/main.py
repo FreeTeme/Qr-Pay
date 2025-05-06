@@ -13,6 +13,7 @@ from qr_utils import generate_qr
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.exceptions import TelegramAPIError
 from sqlalchemy.exc import SQLAlchemyError
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 logging.basicConfig(
     level=logging.INFO,
@@ -105,31 +106,37 @@ async def cmd_start(message: types.Message, command: Command):
             except TelegramAPIError as e:
                 logger.error(f"Ошибка отправки уведомления: {str(e)}")
 
-            # 🔥 Отправляем сообщение с кнопкой Web App
-            web_app_url = f"https://ваш-сайт.ru/app?user_id={user.id}&business_id={business.admin_id}"
-            
-            # Вариант 1: Inline-кнопка (появляется под сообщением)
-            # await message.answer(
-            #     "🔗 Вы привязаны к бизнесу. Нажмите кнопку ниже, чтобы открыть приложение:",
-            #     reply_markup=types.InlineKeyboardMarkup().add(
-            #         types.InlineKeyboardButton(
+            web_app_url = f"https://app.qrpay.tw1.su/?user_id={message.from_user.id}&business_id={business.admin_id}"
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(
+                    text="Перейти в приложение",
+                    web_app=WebAppInfo(url=web_app_url)  # Используем WebApp вместо url
+                )]
+            ])
+
             await message.answer(
                 f"🔗 Вы привязаны к бизнесу: {business.name}\n"
                 f"💰 Ваши баллы: {user_business.points}\n\n"
                 "👇 Нажмите кнопку ниже, чтобы открыть приложение:",
-                reply_markup=ReplyKeyboardMarkup(
-                    keyboard=[
-                        [KeyboardButton(
-                            text="Открыть приложение 🚀",
-                            web_app=WebAppInfo(url=web_app_url))
-                        ]
-                    ],
-                    resize_keyboard=True,  # Адаптирует размер кнопки
-                    
-                )
+                reply_markup=keyboard
             )
         else:
-            await message.answer("👋 Добро пожаловать!")
+            builder = InlineKeyboardBuilder()
+            builder.add(types.InlineKeyboardButton(
+                text="Подключить свой бизнес",
+                url='https://app.qrpay.tw1.su/bis/'
+            ))
+            
+            await message.answer(
+                "👋 Добро пожаловать в SaveX!\n\n"
+                "*Лояльность*\n"
+                "QR-код вместо физ. карт лояльностей - клиенты копят баллы, даже не замечая этого!\n\n"
+                "*Для бизнеса*\n"
+                "Подключение за 20 минут - никаких сложных настроек и дорогих разработок",
+                reply_markup=builder.as_markup(),
+                parse_mode="Markdown"
+            )
     except SQLAlchemyError as e:
         session.rollback()
         logger.error(f"Database error: {str(e)}")
