@@ -1,19 +1,18 @@
-# main.py
 import logging
+import uuid
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, BufferedInputFile
+from aiogram.types import Message, CallbackQuery, BufferedInputFile, FSInputFile
 from config import BOT_TOKEN, ADMINS, BOT_USERNAME
-from db import get_business, get_session, get_user  # используем функцию для получения сессии
+from db import get_business, get_session, get_user
 from models import User, Business, UserBusiness, Purchase
 from qr_utils import generate_qr
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.exceptions import TelegramAPIError
 from sqlalchemy.exc import SQLAlchemyError
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,6 +35,10 @@ class PurchaseStates(StatesGroup):
     AWAITING_AMOUNT = State()
     AWAITING_POINTS = State()
 
+class MenuStates(StatesGroup):
+    MAIN_MENU = State()
+    HOW_IT_WORKS = State()
+
 def is_admin(user_id: int) -> bool:
     return user_id in ADMINS
 
@@ -47,10 +50,33 @@ def get_payment_keyboard(user_id: int, business_id: int):
     )
     return builder.as_markup()
 
-from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
+def get_main_menu_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text="Подключить свой бизнес",
+        url='https://app.qrpay.tw1.su/bis/',
+    )
+    builder.button(
+        text="О нас",
+        url='https://andhanc.github.io/SaveX/',
+    )
+    builder.button(
+        text="Как работает",
+        callback_data="show_how_it_works"
+    )
+    builder.adjust(1, 2)
+    return builder.as_markup()
+
+def get_back_to_menu_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text="Назад",
+        callback_data="back_to_main_menu"
+    )
+    return builder.as_markup()
 
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message, command: Command):
+async def cmd_start(message: types.Message, command: Command, state: FSMContext):
     args = command.args
     session = get_session()
     
@@ -91,7 +117,6 @@ async def cmd_start(message: types.Message, command: Command):
                 session.add(user_business)
                 session.commit()
 
-            # Уведомление админа (как у вас было)
             try:
                 await bot.send_message(
                     chat_id=business.admin_id,
@@ -106,36 +131,45 @@ async def cmd_start(message: types.Message, command: Command):
             except TelegramAPIError as e:
                 logger.error(f"Ошибка отправки уведомления: {str(e)}")
 
-            web_app_url = f"https://app.qrpay.tw1.su/?user_id={message.from_user.id}&business_id={business.admin_id}"
-
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(
-                    text="Перейти в приложение",
-                    web_app=WebAppInfo(url=web_app_url)  # Используем WebApp вместо url
-                )]
-            ])
-
+            web_app_url = f"https://ваш-сайт.ru/app?user_id={user.id}&business_id={business.admin_id}"
+            
+            builder = InlineKeyboardBuilder()
+            builder.button(
+                text="Назад",
+                callback_data="back_to_main_menu"
+            )
+            
             await message.answer(
                 f"🔗 Вы привязаны к бизнесу: {business.name}\n"
                 f"💰 Ваши баллы: {user_business.points}\n\n"
                 "👇 Нажмите кнопку ниже, чтобы открыть приложение:",
-                reply_markup=keyboard
+                reply_markup=types.ReplyKeyboardMarkup(
+                    keyboard=[
+                        [types.KeyboardButton(
+                            text="Открыть приложение 🚀",
+                            web_app=types.WebAppInfo(url=web_app_url))
+                        ]
+                    ],
+                    resize_keyboard=True,
+                )
+            )
+            await message.answer(
+                "↩️ Вернуться в главное меню:",
+                reply_markup=builder.as_markup()
             )
         else:
-            builder = InlineKeyboardBuilder()
-            builder.add(types.InlineKeyboardButton(
-                text="Подключить свой бизнес",
-                url='https://app.qrpay.tw1.su/bis/'
-            ))
-            
-            await message.answer(
-                "👋 Добро пожаловать в SaveX!\n\n"
-                "*Лояльность*\n"
-                "QR-код вместо физ. карт лояльностей - клиенты копят баллы, даже не замечая этого!\n\n"
-                "*Для бизнеса*\n"
-                "Подключение за 20 минут - никаких сложных настроек и дорогих разработок",
-                reply_markup=builder.as_markup(),
-                parse_mode="Markdown"
+            await state.set_state(MenuStates.MAIN_MENU)
+            await message.answer_photo(
+                # photo=types.FSInputFile("C:/Users/user/Downloads/Все магазины в одном приложении.png"),
+                caption=(
+                    "👋 Добро пожаловать в SaveX!\n\n"
+                    "*Лояльность*\n"
+                    "QR-код вместо физ. карт лояльностей - клиенты копят баллы, даже не замечая этого!\n\n"
+                    "*Для бизнеса*\n"
+                    "Подключение за 20 минут - никаких сложных настроек и дорогих разработок"
+                ),
+                parse_mode="Markdown",
+                reply_markup=get_main_menu_keyboard()
             )
     except SQLAlchemyError as e:
         session.rollback()
@@ -147,6 +181,58 @@ async def cmd_start(message: types.Message, command: Command):
     finally:
         session.close()
 
+@dp.callback_query(F.data == "show_how_it_works")
+async def show_how_it_works(callback: CallbackQuery, state: FSMContext):
+    try:
+        await callback.bot.delete_message(
+            chat_id=callback.message.chat.id,
+            message_id=callback.message.message_id
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при удалении сообщения: {e}")
+    
+    await state.set_state(MenuStates.HOW_IT_WORKS)
+    await callback.message.answer_photo(
+        # photo=types.FSInputFile("C:/Users/user/Downloads/Black White Halftone Creative Portfolio Presentation.png"),
+        caption=(
+            "📖 Как работает SaveX?\n\n"
+            "1. Клиенты сканируют QR-код\n"
+            "2. Автоматически регистрируются в системе\n"
+            "3. Копят баллы за покупки\n"
+            "4. Используют баллы для скидок\n\n"
+            "Простое подключение и управление всеми баллами в любимых магазинов"
+        ),
+        reply_markup=get_back_to_menu_keyboard()
+    )
+    await callback.answer()
+
+@dp.callback_query(F.data == "back_to_main_menu")
+async def back_to_main_menu(callback: CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.answer_photo(
+            # photo=types.FSInputFile("C:/Users/user/Downloads/Все магазины в одном приложении.png"),
+            caption=(
+                "👋 Добро пожаловать в SaveX!\n\n"
+                "*Лояльность*\n"
+                "QR-код вместо физ. карт лояльностей - клиенты копят баллы, даже не замечая этого!\n\n"
+                "*Для бизнеса*\n"
+                "Подключение за 20 минут - никаких сложных настроек и дорогих разработок"
+            ),
+            parse_mode="Markdown",
+            reply_markup=get_main_menu_keyboard()
+        )
+        await state.set_state(MenuStates.MAIN_MENU)
+    except Exception as e:
+        logger.error(f"Error: {str(e)}")
+    finally:
+        await callback.answer()
+
+
+@dp.callback_query(F.data == "add_business")
+async def add_business_callback(callback: CallbackQuery, state: FSMContext):
+    await add_business_start(callback.message, state)
+    await callback.answer()
+
 @dp.message(Command("add_business"))
 async def add_business_start(message: Message, state: FSMContext):
     if not is_admin(message.from_user.id):
@@ -155,8 +241,6 @@ async def add_business_start(message: Message, state: FSMContext):
     await message.answer("📝 Введите название бизнеса:")
     await state.set_state(BusinessCreation.AWAITING_NAME)
 
-
-# 2. Обработчик кнопки
 @dp.callback_query(F.data.startswith("process_payment:"))
 async def start_payment_process(callback: CallbackQuery, state: FSMContext):
     try:
@@ -173,10 +257,8 @@ async def start_payment_process(callback: CallbackQuery, state: FSMContext):
         await state.set_state(PurchaseStates.AWAITING_AMOUNT)
         
     except Exception as e:
+        logger.error(f"Error starting payment: {str(e)}")
         await callback.answer("❌ Ошибка запуска оплаты")
-# --------------------------------------------
-# Обработчики состояний
-# --------------------------------------------
 
 @dp.message(PurchaseStates.AWAITING_AMOUNT)
 async def process_purchase_amount(message: Message, state: FSMContext):
@@ -192,7 +274,6 @@ async def process_purchase_amount(message: Message, state: FSMContext):
     except ValueError:
         await message.answer("❌ Некорректная сумма. Введите положительное число.")
 
-
 @dp.message(PurchaseStates.AWAITING_POINTS)
 async def process_purchase_points(message: Message, state: FSMContext):
     session = get_session()
@@ -201,7 +282,7 @@ async def process_purchase_points(message: Message, state: FSMContext):
         user_id = data["user_id"]
         business_id = data["business_id"]
         amount = data["amount"]
-        points = int(message.text)  # Баллы всегда целые
+        points = int(message.text)
         
         user_business = session.query(UserBusiness).filter_by(
             user_id=user_id,
@@ -210,27 +291,25 @@ async def process_purchase_points(message: Message, state: FSMContext):
         
         business = session.get(Business, business_id)
 
-        # 1. Проверка баллов
+        if points < 0:
+            await message.answer("❌ Количество баллов не может быть отрицательным")
+            return
+            
         if points > user_business.points:
             await message.answer("❌ Недостаточно баллов")
             return
 
-        # 2. Проверка 50% лимита
-        max_allowed_points = int(amount * 0.5)  # Округление в меньшую сторону
+        max_allowed_points = int(amount * 0.5)
         if points > max_allowed_points:
             await message.answer(f"❌ Можно списать не более {max_allowed_points} баллов")
             return
 
-        # 3. Списание баллов
         user_business.points -= points
 
-        # 4. Начисление баллов (только если не списывали)
         if points == 0:
-            # Округляем до ближайшего целого
             bonus = round(amount * (business.conversion_rate / 100))
             user_business.points += bonus
 
-        # 5. Сохраняем покупку
         session.add(Purchase(
             user_id=user_id,
             business_id=business_id,
@@ -256,7 +335,6 @@ async def process_purchase_points(message: Message, state: FSMContext):
         await state.clear()
         session.close()
 
-        
 @dp.message(BusinessCreation.AWAITING_NAME)
 async def process_business_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
@@ -268,9 +346,12 @@ async def process_conversion_rate(message: Message, state: FSMContext):
     session = get_session()
     try:
         rate = float(message.text)
+        if rate <= 0:
+            await message.answer("❌ Процент должен быть положительным")
+            return
+            
         data = await state.get_data()
         
-        # Создание бизнеса
         new_business = Business(
             name=data['name'],
             conversion_rate=rate,
@@ -279,12 +360,11 @@ async def process_conversion_rate(message: Message, state: FSMContext):
         session.add(new_business)
         session.commit()
         
-        # Генерация QR
         qr_buffer = generate_qr(new_business.id)
         await message.answer_photo(
             BufferedInputFile(
-                file=qr_buffer.getvalue(),  # Байты изображения
-                filename="qr_code.png"      # Имя файла
+                file=qr_buffer.getvalue(),
+                filename="qr_code.png"
             ),
             caption="Ваш QR-код"
         )
@@ -294,28 +374,33 @@ async def process_conversion_rate(message: Message, state: FSMContext):
     except Exception as e:
         logger.error(f"Ошибка создания бизнеса: {str(e)}")
         await message.answer("⚠️ Ошибка при создании бизнеса")
+        session.rollback()
     finally:
         await state.clear()
         session.close()
 
-# --------------------------------------------
-# Обработка QR-кодов
-# --------------------------------------------
-
 async def handle_qr_scan(message: types.Message, business_id: int):
     session = get_session()
     try:
-        business = get_business(business_id)
+        business = session.get(Business, business_id)
         if not business:
             return await message.answer("❌ Бизнес не найден")
         
-        user = get_user(message.from_user.id)
+        user = session.query(User).filter_by(telegram_id=message.from_user.id).first()
+        if not user:
+            user = User(
+                telegram_id=message.from_user.id,
+                full_name=message.from_user.full_name,
+                username=message.from_user.username,
+            )
+            session.add(user)
+            session.commit()
+            
         user_business = session.query(UserBusiness).filter_by(
             user_id=user.id,
             business_id=business.id
         ).first()
         
-        # Создаем связь если не существует
         if not user_business:
             user_business = UserBusiness(
                 user_id=user.id,
@@ -330,7 +415,6 @@ async def handle_qr_scan(message: types.Message, business_id: int):
             f"⭐ Ваши баллы: {user_business.points}"
         )
         
-        # Уведомление бизнесу
         await bot.send_message(
             business.admin_id,
             f"🔔 Новый клиент!\n"
@@ -341,7 +425,7 @@ async def handle_qr_scan(message: types.Message, business_id: int):
                 inline_keyboard=[[
                     types.InlineKeyboardButton(
                         text="💳 Обработать покупку",
-                        callback_data=f"process_payment_{user.id}_{business.id}"
+                        callback_data=f"process_payment:{user.id}:{business.id}"
                     )
                 ]]
             )
@@ -349,22 +433,24 @@ async def handle_qr_scan(message: types.Message, business_id: int):
         
     except Exception as e:
         logger.error(f"Ошибка обработки QR: {str(e)}")
+        session.rollback()
     finally:
         session.close()
 
-# --------------------------------------------
-# Обработка платежей
-# --------------------------------------------
-
 @dp.callback_query(F.data.startswith("process_payment_"))
 async def start_payment(callback: CallbackQuery, state: FSMContext):
-    _, user_id, business_id = callback.data.split('_')
-    await state.update_data(
-        user_id=int(user_id),
-        business_id=int(business_id)
-    )
-    await callback.message.answer("💵 Введите сумму покупки:")
-    await state.set_state(PaymentStates.AWAITING_AMOUNT)
+    try:
+        _, user_id, business_id = callback.data.split('_')
+        await state.update_data(
+            user_id=int(user_id),
+            business_id=int(business_id)
+        )
+        await callback.message.answer("💵 Введите сумму покупки:")
+        await state.set_state(PaymentStates.AWAITING_AMOUNT)
+        await callback.answer()
+    except Exception as e:
+        logger.error(f"Error starting payment: {str(e)}")
+        await callback.answer("❌ Ошибка запуска оплаты")
 
 @dp.message(PaymentStates.AWAITING_AMOUNT)
 async def process_amount(message: Message, state: FSMContext):
@@ -385,7 +471,6 @@ async def process_points(message: Message, state: FSMContext):
         data = await state.get_data()
         points = int(message.text)
         
-        # Получаем данные
         user_business = session.query(UserBusiness).filter_by(
             user_id=data['user_id'],
             business_id=data['business_id']
@@ -393,19 +478,18 @@ async def process_points(message: Message, state: FSMContext):
         
         business = session.query(Business).get(data['business_id'])
         
-        # Проверка баллов
-        if points < 0 or points > user_business.points:
+        if points < 0:
+            return await message.answer("❌ Количество баллов не может быть отрицательным")
+            
+        if points > user_business.points:
             return await message.answer("❌ Недостаточно баллов")
         
-        # Списание баллов
         user_business.points -= points
         
-        # Начисление новых баллов если не списывали
         if points == 0:
             bonus = data['amount'] * (business.conversion_rate / 100)
             user_business.points += bonus
         
-        # Запись покупки
         purchase = Purchase(
             user_id=data['user_id'],
             business_id=data['business_id'],
@@ -422,17 +506,15 @@ async def process_points(message: Message, state: FSMContext):
             f"⭐ Новый баланс: {user_business.points}"
         )
         
+    except ValueError:
+        await message.answer("❌ Введите целое число баллов")
     except Exception as e:
         logger.error(f"Ошибка платежа: {str(e)}")
         await message.answer("⚠️ Произошла ошибка")
+        session.rollback()
     finally:
         await state.clear()
         session.close()
-
-# --------------------------------------------
-# Запуск бота
-# --------------------------------------------
-
 
 if __name__ == "__main__":
     logger.info("Бот запущен")

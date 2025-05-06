@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaveX - Единая система лояльности</title>
+    <title>SaveX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -911,6 +911,7 @@
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%);
             position: relative;
             overflow: hidden;
+            padding: 60px 0;
         }
 
         .cta::before {
@@ -1585,8 +1586,77 @@
     }
 }
 
+/* Demo Button Section */
+.demo-section {
+    padding: 70px 0 0px 0;
+    position: relative;
+    overflow: hidden;
+}
 
+.btn-demo {
+    display: block;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    font-size: 1.2rem;
+    border-radius: 16px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    transition: var(--transition);
+}
+
+.btn-demo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+}
+
+@media (max-width: 768px) {
+    .demo-section {
+        padding: 60px 0;
+    }
     
+    .btn-demo {
+        max-width: 300px;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .demo-section {
+        padding: 40px 0;
+    }
+    
+    .btn-demo {
+        max-width: 250px;
+        padding: 14px 28px;
+        font-size: 1rem;
+    }
+}
+
+.btn-tariffs {
+    align-items: center;
+    display: block;
+    text-align: center;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.btn-tariffs:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .btn-tariffs {
+        padding: 14px 28px;
+        font-size: 1rem;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -1601,8 +1671,8 @@
                 
                 <div class="nav-links">
                     <a href="#features">Возможности</a>
-                    <a href="#how-it-works">Как это работает</a>
                     <a href="#contact">Контакты</a>
+                    <a href="#registerbtn">Регистрация бизнеса</a>
                 </div>
                 
                 <div class="nav-actions">
@@ -1619,14 +1689,14 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="registerbtn">
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">SaveX</h1>
                 <p class="hero-subtitle">SaveX предлагает инновационный подход к взаимодействию с клиентами. Наша платформа объединяет удобные QR-систему лояльности и глубокую аналитику в едином решении. Получайте детальную информацию о Ваших клиентах, статистику о выручке в одном приложении.</p>
                 
                 <div class="hero-actions">
-                    <a href="#scanner" class="btn btn-primary" onclick="scrollToForm()">
+                    <a href="#scanner" class="btn btn-primary">
                         <i class="fas fa-qrcode"></i> Зарегистрироаться
                     </a>
                     <a href="#" class="btn btn-outline" onclick="openLoginModal()">
@@ -1714,18 +1784,16 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-<<<<<<< HEAD:admin/templates/vhod.html
-                <h2 class="section-title">Возможности QrPay</h2>
-=======
+
                 <h2 class="section-title">Возможности SaveX</h2>
->>>>>>> 1115ebf (сервер):user/admin/templates/vhod.html
+
                 <p class="section-subtitle">Полный набор инструментов в одной программе</p>
             </div>
             
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
+                        <i class="fas fa-car-crash"></i>
                     </div>
                     <h3 class="feature-title">Полная аналитика</h3>
                     <p class="feature-desc">Портрет покупателя, графики продаж</p>
@@ -1778,10 +1846,14 @@
                 </div> -->
            
         </div>
+        <section class="demo-section">
+            <div class="container" >
+                <a href=" https://vladtichonenko.github.io/demo1/" class="btn btn-primary btn-demo" onclick="scrollToForm()">
+                    <i class="fas fa-play-circle"></i> Попробовать демо
+                </a>
+            </div>
+        </section>
     </section>
-
-
-
 
     <div id="loginModal" class="modal">
         <div class="modal-content">
@@ -1793,7 +1865,7 @@
             {% if error %}
             <div class="error">{{ error }}</div>
             {% endif %}
-            <form method="POST" class="modal-form" action="/">
+            <form method="POST" class="modal-form" action="/lk">
                 <input type="text" name="admin_id" class="modal-input" placeholder="Введите ваш ID администратора" required>
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-primary">Войти</button>
@@ -1810,92 +1882,45 @@
                 <p class="cta-subtitle">Оставьте заявку и наш менеджер свяжется с вами для консультации и внедрения</p>
                 
                 <div class="cta-form">
-                    <form id="contactForm">
+                    <form id="contactForm" action="https://api.web3forms.com/submit" method="POST" target="formFrame">
+                        <input type="hidden" name="access_key" value="f87f24f1-7b95-486b-84fd-09c3c848a00c">
+                        <input type="hidden" name="redirect" value="https://web3forms.com/success">
+                        <input type="hidden" name="subject" value="Новая заявка с сайта SaveX">
                         <div class="form-group">
                             <label for="name" class="form-label">Ваше имя</label>
-                            <input type="text" id="name" class="form-input" placeholder="Иван Иванов" required>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Иван Иванов" required>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="form-label">Номер телефона</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="+375 (29) 1212 123" required>
+                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="+375 (29) 1212 123" required>
                         </div>
                         <div class="form-group">
+<<<<<<< HEAD
                             <label for="car" class="form-label">Ваш телеграм</label>
 <<<<<<< HEAD:admin/templates/vhod.html
                             <input type="text" id="car" class="form-input" placeholder="Toyota Camry 2018">
 =======
                             <input type="text" id="car" class="form-input" placeholder="@gre_zamza">
 >>>>>>> 1115ebf (сервер):user/admin/templates/vhod.html
+=======
+                            <label for="telegram" class="form-label">Ваш телеграм</label>
+                            <input type="text" id="telegram" name="telegram" class="form-input" placeholder="@username" required>
+>>>>>>> 7f5ab75 (сервер_2)
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="window.location.href='zapis.html'">
-                             Записаться на консультацию
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            Записаться на консультацию
                         </button>
                     </form>
+                    <a href="https://andhanc.github.io/SaveX/#pricing" class="btn btn-outline btn-tariffs" style="width: 100%; margin-top: 20px;">
+                        <i class="fas fa-chart-line"></i> Смотреть тарифы
+                    </a>
+                    <iframe name="formFrame" style="display: none;"></iframe>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <div class="footer-logo">Truston</div>
-                    <p>Умный сервис для вашего автомобиля. Диагностика, отчеты и маркет проверенных авто с технологией цифрового паспорта.</p>
-                    <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-vk"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">Сервисы</h3>
-                    <ul>
-                        <li class="footer-link"><a href="zapis.html">Диагностика авто</a></li>
-                        <li class="footer-link"><a href="test.html">Маркет автомобилей</a></li>
-                        <li class="footer-link"><a href="#">Личный кабинет</a></li>
-                        <li class="footer-link"><a href="#">Мобильное приложение</a></li>
-                        <li class="footer-link"><a href="diagnostik.html">QR-паспорт</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">Компания</h3>
-                    <ul>
-                        <li class="footer-link"><a href="#">О нас</a></li>
-                        <li class="footer-link"><a href="#">Контакты</a></li>
-                        <li class="footer-link"><a href="#">Блог</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">Помощь</h3>
-                    <ul>
-                        <li class="footer-link"><a href="#">FAQ</a></li>
-                        <li class="footer-link"><a href="#">Центр поддержки</a></li>
-                        <li class="footer-link"><a href="#">Политика конфиденциальности</a></li>
-                        <li class="footer-link"><a href="#">Условия использования</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">Контакты</h3>
-                    <ul>
-                        <li class="footer-link"> info@truston.ru</li>
-                        <li class="footer-link">8029</li>
-                        <li class="footer-link">Минск</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!<div class="footer-bottom">
-                <p>&copy; 2023 Truston. Все права защищены.</p>
-            </div> -->
-        <!-- </div>
-    </footer> --> 
+
 
     <script>
 
@@ -1938,17 +1963,16 @@
             document.querySelector('.nav-links').classList.toggle('show');
         });
 
-        // Form submission
+        // Обработка отправки формы
         document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Показываем сообщение об отправке
+            alert("Отправка данных...");
             
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const car = document.getElementById('car').value;
-            
-            // Here would be AJAX request to server
-            alert(`Спасибо, ${name}! Мы скоро свяжемся с вами по номеру ${phone} для записи на диагностику вашего ${car}.`);
-            this.reset();
+            // Позволяем форме отправиться в iframe
+            setTimeout(() => {
+                alert("Данные успешно отправлены");
+                this.reset();
+            }, 1000);
         });
 
         // Smooth scrolling for anchor links
