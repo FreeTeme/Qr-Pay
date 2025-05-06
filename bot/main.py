@@ -160,7 +160,7 @@ async def cmd_start(message: types.Message, command: Command, state: FSMContext)
         else:
             await state.set_state(MenuStates.MAIN_MENU)
             await message.answer_photo(
-                # photo=types.FSInputFile("C:/Users/user/Downloads/Все магазины в одном приложении.png"),
+                photo=types.FSInputFile("./static/Все магазины в одном приложении.png"),
                 caption=(
                     "👋 Добро пожаловать в SaveX!\n\n"
                     "*Лояльность*\n"
@@ -193,7 +193,7 @@ async def show_how_it_works(callback: CallbackQuery, state: FSMContext):
     
     await state.set_state(MenuStates.HOW_IT_WORKS)
     await callback.message.answer_photo(
-        # photo=types.FSInputFile("C:/Users/user/Downloads/Black White Halftone Creative Portfolio Presentation.png"),
+        photo=types.FSInputFile("./static/Black White Halftone Creative Portfolio Presentation.png"),
         caption=(
             "📖 Как работает SaveX?\n\n"
             "1. Клиенты сканируют QR-код\n"
@@ -210,7 +210,7 @@ async def show_how_it_works(callback: CallbackQuery, state: FSMContext):
 async def back_to_main_menu(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer_photo(
-            # photo=types.FSInputFile("C:/Users/user/Downloads/Все магазины в одном приложении.png"),
+            photo=types.FSInputFile("./static/Все магазины в одном приложении.png"),
             caption=(
                 "👋 Добро пожаловать в SaveX!\n\n"
                 "*Лояльность*\n"

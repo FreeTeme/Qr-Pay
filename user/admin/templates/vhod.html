@@ -1784,9 +1784,7 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-
                 <h2 class="section-title">Возможности SaveX</h2>
-
                 <p class="section-subtitle">Полный набор инструментов в одной программе</p>
             </div>
             
@@ -1865,7 +1863,7 @@
             {% if error %}
             <div class="error">{{ error }}</div>
             {% endif %}
-            <form method="POST" class="modal-form" action="/lk">
+            <form method="POST" class="modal-form" action="/bis/">
                 <input type="text" name="admin_id" class="modal-input" placeholder="Введите ваш ID администратора" required>
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-primary">Войти</button>
@@ -1895,17 +1893,8 @@
                             <input type="tel" id="phone" name="phone" class="form-input" placeholder="+375 (29) 1212 123" required>
                         </div>
                         <div class="form-group">
-<<<<<<< HEAD
-                            <label for="car" class="form-label">Ваш телеграм</label>
-<<<<<<< HEAD:admin/templates/vhod.html
-                            <input type="text" id="car" class="form-input" placeholder="Toyota Camry 2018">
-=======
-                            <input type="text" id="car" class="form-input" placeholder="@gre_zamza">
->>>>>>> 1115ebf (сервер):user/admin/templates/vhod.html
-=======
                             <label for="telegram" class="form-label">Ваш телеграм</label>
                             <input type="text" id="telegram" name="telegram" class="form-input" placeholder="@username" required>
->>>>>>> 7f5ab75 (сервер_2)
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
                             Записаться на консультацию
