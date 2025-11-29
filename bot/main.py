@@ -131,7 +131,7 @@ async def cmd_start(message: types.Message, command: Command, state: FSMContext)
             except TelegramAPIError as e:
                 logger.error(f"Ошибка отправки уведомления: {str(e)}")
 
-            web_app_url = f"https://ваш-сайт.ru/app?user_id={user.id}&business_id={business.admin_id}"
+            web_app_url = f"http://testbitry.twc1.net/app?user_id={user.id}&business_id={business.admin_id}"
             
             builder = InlineKeyboardBuilder()
             builder.button(
@@ -143,14 +143,13 @@ async def cmd_start(message: types.Message, command: Command, state: FSMContext)
                 f"🔗 Вы привязаны к бизнесу: {business.name}\n"
                 f"💰 Ваши баллы: {user_business.points}\n\n"
                 "👇 Нажмите кнопку ниже, чтобы открыть приложение:",
-                reply_markup=types.ReplyKeyboardMarkup(
-                    keyboard=[
-                        [types.KeyboardButton(
+                reply_markup=types.InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [types.InlineKeyboardButton(
                             text="Открыть приложение 🚀",
-                            web_app=types.WebAppInfo(url=web_app_url))
+                            url=web_app_url)
                         ]
-                    ],
-                    resize_keyboard=True,
+                    ]
                 )
             )
             await message.answer(
