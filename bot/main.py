@@ -53,10 +53,6 @@ def get_payment_keyboard(user_id: int, business_id: int):
 def get_main_menu_keyboard():
     builder = InlineKeyboardBuilder()
     builder.button(
-        text="Подключить свой бизнес",
-        url='https://app.qrpay.tw1.su/bis/',
-    )
-    builder.button(
         text="О нас",
         url='https://andhanc.github.io/SaveX/',
     )
